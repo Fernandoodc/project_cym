@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Tables / General - NiceAdmin Bootstrap Template</title>
+  <title>Forms / Elements - NiceAdmin Bootstrap Template</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -44,8 +44,8 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="index.html" class="logo d-flex align-items-center">
-        <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">NiceAdmin</span>
+        <img src="{{ url_for('static', path='/img/logo.png') }}" alt="">
+        <span class="d-none d-lg-block">C&M Emprendimientos</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
@@ -159,7 +159,7 @@
 
             <li class="message-item">
               <a href="#">
-                <img src="assets/img/messages-1.jpg" alt="" class="rounded-circle">
+                <img src="{{ url_for('static', path='/img/messages-1.jpg') }}" alt="" class="rounded-circle">
                 <div>
                   <h4>Maria Hudson</h4>
                   <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
@@ -210,7 +210,7 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+            <img src="{{ url_for('static', path='/img/profile-img.jpg') }}" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -359,12 +359,12 @@
       </li><!-- End Components Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link " data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="forms-elements.html">
+            <a href="forms-elements.html" class="active">
               <i class="bi bi-circle"></i><span>Form Elements</span>
             </a>
           </li>
@@ -387,12 +387,12 @@
       </li><!-- End Forms Nav -->
 
       <li class="nav-item">
-        <a class="nav-link " data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="tables-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="tables-general.html" class="active">
+            <a href="tables-general.html">
               <i class="bi bi-circle"></i><span>General Tables</span>
             </a>
           </li>
@@ -508,12 +508,12 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Clientes</h1>
+      <h1>Agregar Pedido</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Tables</li>
-          <li class="breadcrumb-item active">General</li>
+          <li class="breadcrumb-item">Forms</li>
+          <li class="breadcrumb-item active">Elements</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -524,127 +524,268 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Buscar</h5>
-              <div class="row mb-3">
-                <label for="inputText" class="col-sm-3 col-sm-2">
-                    <select class="form-select" aria-label="Default select example">
-                        <option value="PY" selected>Número de Cédula </option>
-                        <option value="AR">Codigo de Cliente</option>
-                        <option value="UR">Nombre</option>
-                        <option value="BR">Apellido</option>
-                        </select>
-                  </label>
-                </label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control">
-                </div>
-            </div>
-            <div class="table-responsive-sm">
-                <!-- Default Table -->
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col">CI</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
-                    <th scope="col">Estado de Cuenta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                  {% for cliente in clientes %}
-                  <tr data-bs-toggle="modal" data-bs-target="#ExtralargeModal">
-                    <div class="modal fade" id="ExtralargeModal" tabindex="-1">
+              <h5 class="card-title">Nuevo Pedido</h5>
+
+              <!-- General Form Elements -->
+              <form id="aggPedido">
+                <div class="row mb-3">
+                  <label for="inputText" class="col-sm-2 col-form-label">CI - Cliente</label>
+                  <div class="col-sm-5">
+                    <input type="text" class="form-control" id="documento">
+                  </div>
+                  <div class="col-sm-5">
+    
+                      <button type="button" class="btn btn-secondary" onclick="get_client()" id="buscar"><i class="ri-search-2-line"></i></button>
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ExtralargeModal">
+                        Nuevo Cliente
+                    </button>
+                      <div class="modal fade" id="ExtralargeModal" tabindex="-1">
                         <div class="modal-dialog modal-xl">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title">Informacion del cliente</h5>
+                              <h5 class="modal-title">Agregar Cliente Nuevo</h5>
                               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form>
+                                <form id="newCliente">
                                     <div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">CI/RUC</label>
                                         <div class="col-sm-10">
-                                          <input type="text" class="form-control" value="{{cliente.documento}}" disabled>
+                                          <input type="text" id="newDocumento" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label for="inputText" class="col-sm-2 col-form-label">Nombre y Apellido</label>
+                                        <label for="inputText" class="col-sm-2 col-form-label">Nombre</label>
                                         <div class="col-sm-10">
-                                          <input type="text" class="form-control" value="{{cliente.Nombre}} {{cliente.apellido}}" disabled>
+                                          <input type="text"  id="newNombre" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Apellido</label>
+                                      <div class="col-sm-10">
+                                        <input type="text"  id="newApellido" class="form-control" required>
+                                      </div>
+                                  </div>
+                                    <!--<div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">Nacionalidad</label>
                                         <div class="col-sm-10">
-                                            <select class="form-select" aria-label="Default select example" disabled>
+                                            <select class="form-select" aria-label="Default select example">
                                               <option selected>Paraguaya</option>
                                               <option value="1">Argentina</option>
                                               <option value="2">Uruguaya</option>
                                               <option value="3">Brasilera</option>
                                             </select>
                                           </div>
-                                    </div>
+                                    </div> -->
                                     <div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">Dirección</label>
                                         <div class="col-sm-10">
-                                          <input type="text" class="form-control" value="{{cliente.direccion}}" disabled>
+                                          <input type="text" id="newDireccion" class="form-control">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">Celular</label>
-                                        <div class="col-sm-3">
-                                            <select class="form-select" aria-label="Default select example" disabled>
+                                        <!--<div class="col-sm-3">
+                                            <select class="form-select" aria-label="Default select example">
                                             <option value="PY" selected>+595</option>
                                             <option value="AR">+549</option>
                                             <option value="UR">+598</option>
                                             <option value="BR">+55</option>
                                             </select>
-                                        </div>
-                                        <div class="col-sm-7">
-                                        <input type="number" class="form-control" value="{{cliente.celular}}" disabled>
+                                        </div> -->
+                                        <div class="col-sm-10">
+                                        <input type="number" id="newCelular" class="form-control">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">Email</label>
                                         <div class="col-sm-10">
-                                          <input type="email" class="form-control" value="{{cliente.email}}" disabled>
+                                          <input type="email" id="newEmail" class="form-control">
                                         </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <label for="inputText" class="col-sm-2 col-form-label">Estado de Cuenta</label>
-                                        <div class="col-sm-3">
-                                          <input type="email" class="form-control text-danger" value="{{cliente.saldo}}" disabled>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <button class="btn btn-primary">Abonar</button>
-                                        </div>
-                                        
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button class="btn btn-primary" id="editar-cliente">Editar</button>
-                                        <button type="button" class="btn btn-success">Save changes</button>
-                                      </div>
-                                  </form>
+                                        <button type="button" id="cancelar" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" id="aggCliente" class="btn btn-success">Guardar</button>
+                                    </div>
+                                </form>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    <td>{{cliente.documento}}</td>
-                    <td>{{cliente.nombre}}</td>
-                    <td>{{cliente.apellido}}</td>
-                    <td class="text-danger">{{cliente.saldo}}</td>
-                  </tr>
-                  {% endfor%}
-        
-                </tbody>
-              </table>
-              <!-- End Default Table Example -->
-            </div>
+                      </div><!-- End Extra Large Modal-->
+                  </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputText" class="col-sm-2 col-form-label">Nombre</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="nombre" disabled>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputText" class="col-sm-2 col-form-label">Celular</label>
+                    <!-- <div class="col-sm-3">
+                        <select class="form-select" aria-label="Default select example">
+                          <option value="PY" selected>+595</option>
+                          <option value="AR">+549</option>
+                          <option value="UR">+598</option>
+                          <option value="BR">+55</option>
+                        </select>
+                      </div> -->
+                    <div class="col-sm-9">
+                      <input type="number" id="numCelular" class="form-control">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="inputText" class="col-sm-2 col-form-label">Dirección</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="direccion" class="form-control">
+                  </div>
+              </div>
+                <!-- informacion del pedido -->
+                <div class="row mb-3" id="div_productos">
+                    <label class="col-sm-2 col-form-label">Producto</label>
+                    <div class="col-sm-5">
+                      <select class="form-select" id="productos" aria-label="Default select example">
+                        {% for producto in productos %}
+                        <option value="{{producto.cod_producto}}">{{producto.cod_producto}} - {{producto.descripcion}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-sm-5">
+                      <select class="form-select" id="variaciones" aria-label="Default select example">
+                        
+                      </select>
+                    </div>
+                </div>
+                <div id="calculo_precio">
+
+                </div>
+                <div class="row mb-3">
+                    <label for="inputPassword" class="col-sm-2 col-form-label">Descripción</label>
+                    <div class="col-sm-10">
+                      <textarea class="form-control" id="descripcion" style="height: 100px"></textarea>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="inputText" class="col-sm-2 col-form-label">Cantidad</label>
+                  <div class="col-sm-10">
+                    <input type="number" id="cantidad" class="form-control">
+                  </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">File Upload</label>
+                    <div class="col-sm-10">
+                      <input class="form-control" type="file" id="archivos" multiple>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputDate" class="col-sm-2 col-form-label" >Fecha Pedido</label>
+                    <div class="col-sm-10">
+                      <input type="date" class="form-control" id="fecha_pedido">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputDate" class="col-sm-2 col-form-label">Fecha Entrega</label>
+                    <div class="col-sm-10">
+                      <input type="datetime-local" class="form-control" id="fecha_entrega">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-10 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="checkDelivery">
+                            <label class="form-check-label" for="gridCheck1">
+                                Delivery
+                            </label>
+                        </div>
+                    </div>
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label">Descuento</label>
+                  <div class="col-sm-10">
+                    <input type="number" class="form-control" id="descuento" value="0" disabled>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Presupuesto</label>
+                        <div class="col-sm-10">
+                          <input type="number" class="form-control" id="presupuesto">
+                        </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary" id="agregar"><i class="ri-add-line"></i></button>
+                    <button type="submit" class="btn btn-success" id="terminar">Terminar</button>
+                    <button type="button" class="btn btn-danger" id="limpiar">Limpiar</button>
+                  </div>
+                </div>
+
+              </form><!-- End General Form Elements -->
+              <div class="card table-responsive-sm">
+                <div class="card-body">
+                  <h5 class="card-title">Lista</h5>
+    
+                  <!-- Table with hoverable rows -->
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Cant.</th>
+                        <th scope="col">Archivos</th>
+                        <th scope="col">Fecha de Entrega</th>
+                        <th scope="col">Delivery</th>
+                        <th scope="col">Presupuesto</th>
+                        <th scope="col">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>Lorem ipsum dolor sit amet. Aut iste porro vel vitae sapiente qui dignissimos doloremque est provident suscipit in laudantium quod 33 facilis accusamus. Sit dolorem nulla sed vero consectetur aut libero labore.</td>
+                        <td>1</td>
+                        <td>aca van archivo :V</td>
+                        <td>25/05/2024</td>
+                        <td> <input type="checkbox" checked name="" id="" disabled> </td>
+                        <td>50.000</td>
+                        <td>
+                          <button class="btn btn-primary">Editar</button>
+                          <button class="btn btn-danger"><i class="ri-delete-bin-5-line"></i></button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>Lorem ipsum dolor sit amet. Aut iste porro vel vitae sapiente qui dignissimos doloremque est provident suscipit in laudantium quod 33 facilis accusamus. Sit dolorem nulla sed vero consectetur aut libero labore.</td>
+                        <td>1</td>
+                        <td>aca van archivo :V</td>
+                        <td>25/02/2022</td>
+                        <td> <input type="checkbox" name="" id="" disabled> </td>
+                        <td>15.000</td>
+                        <td>
+                          <button class="btn btn-primary">Editar</button>
+                          <button class="btn btn-danger"><i class="ri-delete-bin-5-line"></i></button>
+                        </td>
+                      </tr><tr>
+                        <th scope="row">1</th>
+                        <td>Lorem ipsum dolor sit amet. Aut iste porro vel vitae sapiente qui dignissimos doloremque est provident suscipit in laudantium quod 33 facilis accusamus. Sit dolorem nulla sed vero consectetur aut libero labore.</td>
+                        <td>3</td>
+                        <td>aca van archivo :V</td>
+                        <td>25/05/2024</td>
+                        <td> <input type="checkbox"name="" id="" disabled> </td>
+                        <td>500.000</td>
+                        <td>
+                          <button class="btn btn-primary">Editar</button>
+                          <button class="btn btn-danger"><i class="ri-delete-bin-5-line"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!-- End Table with hoverable rows -->
+    
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -667,19 +808,31 @@
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
-  <script src="{{ url_for('static', path='/vendor/apexcharts/apexcharts.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/chart.js/chart.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/echarts/echarts.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/quill/quill.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/simple-datatables/simple-datatables.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/tinymce/tinymce.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/vendor/php-email-form/validate.js') }}"></script>
+<!-- Vendor JS Files -->
+<script src="{{ url_for('static', path='/vendor/apexcharts/apexcharts.min.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/chart.js/chart.min.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/echarts/echarts.min.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/quill/quill.min.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/simple-datatables/simple-datatables.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/tinymce/tinymce.min.js') }}"></script>
+<script src="{{ url_for('static', path='/vendor/php-email-form/validate.js') }}"></script>
 
-  <!-- Template Main JS File -->
-  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
-
+<!-- Template Main JS File -->
+<script src="{{ url_for('static', path='/js/main.js') }}"></script>
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/axios.js') }}"></script>
+<script>
+  const productos = {{productos | tojson}}
+  let delivery = {{delivery.precioDelivery | tojson}}
+</script>
+<script src="{{ url_for('static', path='/js/pedidos.js') }}"></script>
 </body>
-
+<!--<label class="col-sm-2 col-form-label">Dimensiones cm2</label>
+<div class="col-sm-5">
+  <label for="inputText" class="col-sm-1 col-form-label">Ancho</label> 
+  <input type="number" class="form-control">
+</div><div class="col-sm-4">
+  <label for="inputText" class="col-sm-1 col-form-label">Alto</label> 
+  <input type="number" class="form-control"> </div> --->
 </html>
