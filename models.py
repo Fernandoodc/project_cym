@@ -22,11 +22,11 @@ class clientes(BaseModel):
     saldo: int = 0
 
 #productos
-class descuento(BaseModel):
+class pMaroristas(BaseModel):
     cantidad: int
-    descuento: int
+    precioMayorista: int
 class insumosPorProducto(BaseModel):
-    insumo_id: str
+    insumo_Id: str
     cantidad: int
 class variaciones(BaseModel):
     codVariacion: str
@@ -41,6 +41,6 @@ class product(BaseModel):
     cod_producto : str
     descripcion : str
     precioBase : int
-    descuentos : list[descuento]
-    variaciones : list[variaciones]
+    precioMayoristas : list[pMaroristas]
+    insumos : List[insumosPorProducto]
     metodoCalculo: metodoDeCalculo

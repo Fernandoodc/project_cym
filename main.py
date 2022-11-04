@@ -69,14 +69,15 @@ def agg_user(usuario:models.user):
 @app.post("/agg/product", status_code=status.HTTP_201_CREATED)
 async def agg_product(product: models.product):
     data = json.loads(product.json())
-    for i in range(len(data['variaciones']['insumosPorVariacion'])):
+    #for i in range(len(data['variaciones']['insumosPorVariacion'])):
+    for i in range(len(data['insumos'])):
         #falta comprovación de si existe ese insumo en la bd
             #data['variaciones']['insumosPorVariacion'][i]['insumo_id'] = {
              #   "$oid": data['variaciones']['insumosPorVariacion'][i]['insumo_id']
             #}
         #falta ordenar los descuentos con burbuja, para evitar errores en el js
-            aux = data['variaciones']['insumosPorVariacion'][i]['insumo_id']
-            data['variaciones']['insumosPorVariacion'][i]['insumo_id'] = ObjectId(aux)
+            aux = data['insumos'][i]['insumo_Id']
+            data['insumos'][i]['insumo_Id'] = ObjectId(aux)
     print(db['productos'].insert_one(data))
 
 @app.get("/get-products")
