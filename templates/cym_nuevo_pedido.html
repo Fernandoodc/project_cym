@@ -527,7 +527,7 @@
               <h5 class="card-title">Nuevo Pedido</h5>
 
               <!-- General Form Elements -->
-              <form id="aggPedido">
+              <form id="aggPedido" enctype="multipart/form-data" method="post">
                 <div class="row mb-3">
                   <label for="inputText" class="col-sm-2 col-form-label">CI - Cliente</label>
                   <div class="col-sm-5">
@@ -538,7 +538,7 @@
                       <button type="button" class="btn btn-secondary" onclick="get_client()" id="buscar"><i class="ri-search-2-line"></i></button>
                       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ExtralargeModal">
                         Nuevo Cliente
-                    </button>
+                      </button>
                       <div class="modal fade" id="ExtralargeModal" tabindex="-1">
                         <div class="modal-dialog modal-xl">
                           <div class="modal-content">
@@ -547,23 +547,24 @@
                               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="newCliente">
+                                
+                              <div id="newCliente">
                                     <div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">CI/RUC</label>
                                         <div class="col-sm-10">
-                                          <input type="text" id="newDocumento" class="form-control" required>
+                                          <input type="text" id="newDocumento" class="form-control">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <label for="inputText" class="col-sm-2 col-form-label">Nombre</label>
                                         <div class="col-sm-10">
-                                          <input type="text"  id="newNombre" class="form-control" required>
+                                          <input type="text"  id="newNombre" class="form-control">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                       <label for="inputText" class="col-sm-2 col-form-label">Apellido</label>
                                       <div class="col-sm-10">
-                                        <input type="text"  id="newApellido" class="form-control" required>
+                                        <input type="text"  id="newApellido" class="form-control">
                                       </div>
                                   </div>
                                     <!--<div class="row mb-3">
@@ -605,9 +606,9 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" id="cancelar" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" id="aggCliente" class="btn btn-success">Guardar</button>
+                                        <button type="button" id="aggCliente" class="btn btn-success">Guardar</button>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                           </div>
                         </div>
@@ -631,30 +632,30 @@
                         </select>
                       </div> -->
                     <div class="col-sm-9">
-                      <input type="number" id="numCelular" class="form-control">
+                      <input type="number" id="numCelular" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="row mb-3">
                   <label for="inputText" class="col-sm-2 col-form-label">Dirección</label>
                   <div class="col-sm-10">
-                    <input type="text" id="direccion" class="form-control">
+                    <input type="text" id="direccion" class="form-control" disabled>
                   </div>
-              </div>
+                </div>
                 <!-- informacion del pedido -->
                 <div class="row mb-3" id="div_productos">
                     <label class="col-sm-2 col-form-label">Producto</label>
-                    <div class="col-sm-5">
+                    <div class="col-sm-10">
                       <select class="form-select" id="productos" aria-label="Default select example">
                         {% for producto in productos %}
-                        <option value="{{producto.cod_producto}}">{{producto.cod_producto}} - {{producto.descripcion}}</option>
+                        <option value="{{producto.codProducto}}">{{producto.codProducto}} - {{producto.descripcion}}</option>
                         {% endfor %}
                       </select>
                     </div>
-                    <div class="col-sm-5">
+                    <!--<div class="col-sm-5">
                       <select class="form-select" id="variaciones" aria-label="Default select example">
                         
                       </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div id="calculo_precio">
 
@@ -675,7 +676,8 @@
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label">File Upload</label>
                     <div class="col-sm-10">
-                      <input class="form-control" type="file" id="archivos" multiple>
+                      <input class="form-control" type="file" id="archivos" name="files" multiple>
+                    
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -693,7 +695,7 @@
                 <div class="row mb-3">
                     <div class="col-sm-10 mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="checkDelivery">
+                            <input class="form-check-input" type="checkbox" id="checkDelivery" checked>
                             <label class="form-check-label" for="gridCheck1">
                                 Delivery
                             </label>
@@ -713,19 +715,19 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-sm-10">
-                    <button type="submit" class="btn btn-primary" id="agregar"><i class="ri-add-line"></i></button>
-                    <button type="submit" class="btn btn-success" id="terminar">Terminar</button>
+                    <button type="button" class="btn btn-primary" id="agregar"><i class="ri-add-line"></i></button>
+                    <button type="button" class="btn btn-success" id="terminar">Terminar</button>
                     <button type="button" class="btn btn-danger" id="limpiar">Limpiar</button>
                   </div>
                 </div>
-
-              </form><!-- End General Form Elements -->
+              </form>
+              <!-- End General Form Elements -->
               <div class="card table-responsive-sm">
                 <div class="card-body">
                   <h5 class="card-title">Lista</h5>
     
                   <!-- Table with hoverable rows -->
-                  <table class="table table-hover">
+                  <table class="table table-hover" id="listaPedidos">
                     <thead>
                       <tr>
                         <th scope="col">#</th>
@@ -738,45 +740,7 @@
                         <th scope="col">Acciones</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>Lorem ipsum dolor sit amet. Aut iste porro vel vitae sapiente qui dignissimos doloremque est provident suscipit in laudantium quod 33 facilis accusamus. Sit dolorem nulla sed vero consectetur aut libero labore.</td>
-                        <td>1</td>
-                        <td>aca van archivo :V</td>
-                        <td>25/05/2024</td>
-                        <td> <input type="checkbox" checked name="" id="" disabled> </td>
-                        <td>50.000</td>
-                        <td>
-                          <button class="btn btn-primary">Editar</button>
-                          <button class="btn btn-danger"><i class="ri-delete-bin-5-line"></i></button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>Lorem ipsum dolor sit amet. Aut iste porro vel vitae sapiente qui dignissimos doloremque est provident suscipit in laudantium quod 33 facilis accusamus. Sit dolorem nulla sed vero consectetur aut libero labore.</td>
-                        <td>1</td>
-                        <td>aca van archivo :V</td>
-                        <td>25/02/2022</td>
-                        <td> <input type="checkbox" name="" id="" disabled> </td>
-                        <td>15.000</td>
-                        <td>
-                          <button class="btn btn-primary">Editar</button>
-                          <button class="btn btn-danger"><i class="ri-delete-bin-5-line"></i></button>
-                        </td>
-                      </tr><tr>
-                        <th scope="row">1</th>
-                        <td>Lorem ipsum dolor sit amet. Aut iste porro vel vitae sapiente qui dignissimos doloremque est provident suscipit in laudantium quod 33 facilis accusamus. Sit dolorem nulla sed vero consectetur aut libero labore.</td>
-                        <td>3</td>
-                        <td>aca van archivo :V</td>
-                        <td>25/05/2024</td>
-                        <td> <input type="checkbox"name="" id="" disabled> </td>
-                        <td>500.000</td>
-                        <td>
-                          <button class="btn btn-primary">Editar</button>
-                          <button class="btn btn-danger"><i class="ri-delete-bin-5-line"></i></button>
-                        </td>
-                      </tr>
+                    <tbody id="bodyLista">
                     </tbody>
                   </table>
                   <!-- End Table with hoverable rows -->
@@ -822,9 +786,10 @@
 <script src="{{ url_for('static', path='/js/main.js') }}"></script>
 <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
 <script src="{{ url_for('static', path='/js/axios.js') }}"></script>
+<script src="{{ url_for('static', path='/js/func_pedidos.js') }}"></script>
 <script>
   const productos = {{productos | tojson}}
-  let delivery = {{delivery.precioDelivery | tojson}}
+  const delivery = {{delivery.precioDelivery | tojson}}
 </script>
 <script src="{{ url_for('static', path='/js/pedidos.js') }}"></script>
 </body>
