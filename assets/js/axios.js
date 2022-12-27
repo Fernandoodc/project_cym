@@ -1,5 +1,4 @@
 function get_client() {
-    console.log('gg')
     doc = document.getElementById('documento').value
         $.ajax({
             type: "GET",
@@ -9,22 +8,25 @@ function get_client() {
                console.log(result)
                 if(xhr.status == 200){
                     console.log(xhr.status)
-                    //id_cliente = result._id.$oid
+                    id_cliente = result._id.$oid
                     document.getElementById('nombre').value=result.nombre + " " + result.apellido
                     document.getElementById('numCelular').value = result.celular
                     document.getElementById('direccion').value = result.direccion
+                    $('#alertText').html('')
                 }
             },
             complete: function(xhr, textStatus) {
                 console.log(xhr.status)
                 if(xhr.status == 404){
+                    id_cliente = null
                     document.getElementById('nombre').value= ""
                     document.getElementById('numCelular').value = ""
                     document.getElementById('direccion').value = ""
+                    $('#alertText').html('cliente no encontrado')
                 }
                 else
                     if(xhr.status==401){
-                    window.location.href = '/'
+                        unauthorized()
                     }
             } 
         });
@@ -32,10 +34,10 @@ function get_client() {
 }
 
 async function create_pedido(data){
-    let codPedido = ""
+    console.log("desde create_pedido" + data)
     await $.ajax({
         type: "POST",
-        url: "/create_pedido",
+        url: "/pedidos/create_pedido",
         data: JSON.stringify(data),
         contentType: "application/json",
         dataType: 'json',
@@ -56,16 +58,13 @@ async function create_pedido(data){
 
 }
 
-
-
-
  
 async function aggDetallePedido(data){
     let response = {
     }
     await $.ajax({
         type: "POST",
-        url: "/agg_detpedido",
+        url: "/pedidos/agg_detpedido",
         data: JSON.stringify(data),
         contentType: "application/json",
         dataType: 'json',
@@ -117,8 +116,7 @@ async function uploadFiles(data){
 function eliminarDet(codDet){
     $.ajax({
         type: "DELETE",
-        url: "/eliminar_det",
-        date: codDet,
+        url: "/pedidos/eliminar_det?codDetalle="+codDet,
         success: function(result, textStatus, xhr) { 
             console.log(result)
             document.getElementById(codDet).remove()
@@ -126,6 +124,22 @@ function eliminarDet(codDet){
         },
         complete: function(xhr, textStatus) {
         } 
+    });
+}
+
+async function eliminarPedido(codPedido){
+    $.ajax({
+        type: "DELETE",
+        url: "/pedidos/eliminar_pedido?codPedido="+codPedido,
+        success: function(result, textStatus, xhr) { 
+            
+        },
+        complete: function(xhr, textStatus) {
+        },
+        error: function(e){
+            console.log(e.responseText)
+            alert(e)
+        }
     });
 }
 
@@ -151,7 +165,7 @@ async function infoProduccion(codProduccion){
     let response = {}
     await $.ajax({
         type: "GET",
-        url: "/info_produccion/" + codProduccion,        
+        url: "/trabajos/info_produccion/" + codProduccion,        
         success: function(result, textStatus, xhr) { 
             response = result
 
@@ -175,4 +189,68 @@ function viewFile(codPedido, codDet, filename){
         } 
     });
     return response
+}
+
+async function uploaDesign(desing){
+    let rutas = []
+    await $.ajax({
+        type: "POST",
+        enctype: 'multipart/form-data',
+        url: "/upload_diseno",
+        data: desing,
+        processData: false,
+        contentType: false,
+        cache: false,
+        //timeout: 600000,
+        success: function (data) {
+            //$("#result").text(data);
+            console.log("SUCCESS : ", data.files);
+            rutas = data.files;
+           //$("#btnSubmit").prop("disabled", false);
+
+        },
+        error: function (e) {
+            //$("#result").text(e.responseText);
+            console.log("ERROR : ", e.responseText);
+            rutas = 0 ;
+            //$("#btnSubmit").prop("disabled", false);
+
+        }
+    });
+    return rutas;
+}
+
+async function deleteDesing(codPedido, codDetalle, codProduccion, filename){
+    $.ajax({
+        type: "DELETE",
+        url: "/delete_disenio?"+ $.param({"filename": filename, "cod_pedido" : codPedido, "cod_produccion": codProduccion, "cod_detalle": codDetalle}),
+        success: function(result, textStatus, xhr) { 
+            
+        },
+        complete: function(xhr, textStatus) {
+        },
+        error: function(e){
+            console.log(e.responseText)
+            alert(e)
+        }
+    });
+}
+
+async function aprovacion(data){
+    await $.ajax({
+        type: "POST",
+        url: "/trabajos/act_aprovacion",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function(result, textStatus, xhr) { 
+        
+
+        },
+        complete: function(xhr, textStatus){
+        },
+        error: function(e){
+            console.log(e)
+        }
+    });
 }

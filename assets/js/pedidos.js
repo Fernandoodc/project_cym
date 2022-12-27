@@ -4,6 +4,7 @@ const cantidad = document.getElementById('cantidad')
 const checkDel = document.getElementById("checkDelivery")
 const agg = document.getElementById("agregar")
 const aggCliente = document.getElementById("aggCliente")
+const cancel = document.getElementById("cancelar")
 let codMetodo = 0
 precioBase = 0
 precioExtra = 0
@@ -13,6 +14,8 @@ band = false
 //let variaciones = []
 var pMayoristas = []
 id_cliente = ""
+CODPEDIDO = null
+TOTAL = 0
 function init(){
   var fPedido = document.getElementById("fecha_pedido")
   var fEntrega = document.getElementById("fecha_entrega")
@@ -20,6 +23,7 @@ function init(){
   fPedido.setAttribute("min", date(1))
   fEntrega.value = date()
   fEntrega.setAttribute("min", date())
+  $('#divDireccion').hide()
 }
 
 function date(format=2){
@@ -52,6 +56,21 @@ const prodSelected = () => {
     console.log(productos[indice])
     //variaciones = productos[indice].variaciones
     pMayoristas = productos[indice].preciosMayoristas
+
+    for (i=0; i<pMayoristas.length-1; i++)
+	  {
+      for(z=i+1; z<pMayoristas.length; z++)
+      {
+        if (pMayoristas[i].cantidad>pMayoristas[z].cantidad)
+        {
+          aux=pMayoristas[i].cantidad;
+          pMayoristas[i].cantidad=pMayoristas[z].cantidad;
+          pMayoristas[z].cantidad=aux;
+        }
+      }
+	  }
+    console.log(pMayoristas)
+
     //select_var.innerHTML=""
     //console.log(variaciones.length)
     /*for(i=0; i<variaciones.length ; i++){
@@ -140,18 +159,27 @@ const actPresup = () => {
 
 }
 
-
-
-
 const agregar = async () => {
-    if(id_cliente == ""){
+    if(id_cliente == "" || id_cliente == null){
       $('#documento').focus();
       return 0;
     }
-    if(cantidad.value == 0 || cantidad.value == ''){
+    if(cantidad.value == 0 || cantidad.value == '' || cantidad.value < 0){
       $('#cantidad').focus();
       return 0;
     }
+    if(codMetodo == 2 || codMetodo == 3){
+      if($('#ancho').val() == '' || $('#ancho').val() == 0 || $('#ancho').val() < 0){
+        $('#ancho').focus()
+        return 0;
+      }
+      if($('#alto').val() == '' || $('#alto').val() == 0 || $('#alto').val() < 0){
+        $('#alto').focus()
+        return 0;
+      }
+
+    }
+    $("#agregar").prop("disabled", true);
     if(band == false){
       let dataPedido = {
         "fecha":  document.getElementById('fecha_pedido').value,
@@ -159,13 +187,15 @@ const agregar = async () => {
       }
       console.log(dataPedido)
       codPedido = await create_pedido(dataPedido)
+      console.log(codPedido)
       if(codPedido == 0){
         console.log("Error al Crear el Pedido");
         return 0;
       }
+      CODPEDIDO = codPedido
+      $('.codPedido').html(codPedido)
       band = true
     }
-    
     // disabled the submit button
     //$("#btnSubmit").prop("disabled", true);
     
@@ -176,10 +206,13 @@ const agregar = async () => {
       "descripcion": document.getElementById("descripcion").value,
       "cantidad": cantidad.value,
       "fechaEntrega": document.getElementById("fecha_entrega").value,
-      "delivery": false
+      "delivery": {
+        'solicitado' : false
+      }
     } 
     if(checkDel.checked){
-      detPedido.delivery = true
+      detPedido.delivery.solicitado = true
+      detPedido.delivery.direccion = $('#direccion').val()
     }
     if(codMetodo == 2 || codMetodo == 3){
       detPedido.medidas = {
@@ -210,8 +243,38 @@ const agregar = async () => {
     }else
       files = []
     
+
       
-    actLista(detPedido.descripcion, detPedido.cantidad, files, detPedido.fechaEntrega, detPedido.delivery, detalle.presu, detalle.codDetalle);
+    actLista(detPedido.descripcion, detPedido.cantidad, files, detPedido.fechaEntrega, detPedido.delivery.solicitado, detalle.presu, detalle.codDetalle);
+    
+    TOTAL = TOTAL + parseInt($('#presupuesto').val())
+    $('.total').text(TOTAL)
+    $("#terminar").prop("disabled", false);
+
+    $("#agregar").prop("disabled", false);
+    $("#documento").prop("disabled", true);
+    $('#buscar').hide()
+    $('#newCliente').hide()
+    $('#divDocumento').addClass('col-sm-10')
+    $('#descripcion').val('')
+    $('#cantidad').val('')
+    $('#archivos').val('')
+    $('#presupuesto').val('')
+    $('#descuento').val('')
+    $('#ancho').val('')
+    $('#alto').val('')
+
+
+}
+
+const cancelar = async () =>{
+  //$('#cancelar').prop('disabled', true)
+  if (CODPEDIDO != null){
+    await eliminarPedido(CODPEDIDO)
+    window.location.reload()
+  }
+  console.log('gg')
+  //window.location.reload()
 
 }
 /*function getFiles()
@@ -253,20 +316,35 @@ const agregar = async () => {
 }*/
 
 const agregarCliente = () =>{
-  data = {
-    "documento": document.getElementById("newDocumento").value,
-    "nombre": document.getElementById("newNombre").value,
-    "apellido": document.getElementById("newApellido").value,
-    "email": document.getElementById("newEmail").value,
-    "celular": document.getElementById("newCelular").value,
-    "direccion": document.getElementById("newDireccion").value
+  var documento = $('#newDocumento')
+  var nombre = $('#newNombre')
+  var apellido = $('#newApellido')
+  if(documento.val()==''){
+    documento.focus()
+    return 0;
   }
-  
-  console.log(data)
+  if(nombre.val()==''){
+    nombre.focus()
+    return 0;
+  }
+  if(apellido.val()==''){
+    apellido.focus()
+    return 0;
+  }
+
+  var data = {
+    "documento": documento.val(),
+    "nombre": nombre.val(),
+    "apellido": apellido.val(),
+    "email": $('#newEmail').val(),
+    "celular":$('#newCelular').val(),
+    "direccion": $('#newDireccion').val(),
+    "nacionalidad": $('#newNacionalidad').val()
+  }
   
   $.ajax({
     type: "POST",
-    url: "/agg/clients",
+    url: "/clientes/agg/cliente",
     data: JSON.stringify(data),
     contentType: "application/json",
     dataType: 'json',
@@ -275,57 +353,42 @@ const agregarCliente = () =>{
         //document.getElementById("newCliente").reset()
 
     },
-    complete: function(xhr, textStatus) {
-    } 
+    success: function(xhr, textStatus) {
+      console.log("success - "+textStatus)
+      console.log(data.documento)
+      $('#documento').val(data.documento);
+      $('#alertNuevoCliente').html('')
+      $('#newCliente-modal').modal('hide');
+      get_client()
+
+    },
+    error: function(e){
+      console.log(e.responseText)
+      if(e.status == 409){
+        $('#alertNuevoCliente').addClass('alert-danger')
+        $('#alertNuevoCliente').html('El Cliente ya se encuentra Registrado')
+      }
+        
+      if(e.status == 500){
+        $('#alertNuevoCliente').addClass('alert-warning')
+        $('#alertNuevoCliente').html('Ocurrió un error interno')
+      }
+        
+    }
 });
 }
 
-
-/*{
-  "fecha":,
-  "cliente_id":,
-  "detallesPedido":[
-    "detalleProducto":{
-      "producto_id":,
-      "medidas":
-    },
-    "cantidad":
-    "delivery":
-    "descripcion":
-    "fechaHoraEntrega":
-    "archivos": 
-  ]
-}*/
-
-/*const desc = () => {
-  pMayorista = 0
-  precio = precioBase
-  for(i=0; i<pMayoristas.length; i++){
-    if(cantidad.value>=pMayoristas[i].cantidad)
-      pMayorista = pMayoristas[i].precio
+$('#checkDelivery').change(function (e){
+  if($(this).is(':checked')){
+    $('#divDireccion').show()
   }
-  const divDesc = document.getElementById("descuento")
-  divDesc.innerHTML = ""
-  if(pMayorista>0){
-    divDesc.setAttribute("class", "row mb-3")
-    const labelDesc = document.createElement("label")
-    labelDesc.setAttribute("class", "col-sm-2 col-form-label")
-    labelDesc.innerHTML = "Descuento"
-    const divIDesc = document.createElement("div")
-    divIDesc.setAttribute("class", "col-sm-10")
-    const inputDesc = document.createElement("input")
-    inputDesc.disabled = true
-    inputDesc.setAttribute("class", "form-control")
-    inputDesc.setAttribute("type", "number")
-    divDesc.appendChild(labelDesc)
-    divIDesc.appendChild(inputDesc)
-    divDesc.appendChild(divIDesc)
-  }
-}*/
-//console.log(date())
+  else
+  $('#divDireccion').hide()
+})
+
 init()
 prodSelected()
-select.addEventListener("change", prodSelected);
+$('#productos').change(prodSelected)
 select.addEventListener("change", actPresup);
 //select_var.addEventListener("change", varSelected);
 //select_var.addEventListener("change", actPresup);
@@ -334,4 +397,5 @@ agg.addEventListener('click', agregar)
 aggCliente.addEventListener('click', agregarCliente)
 //cantidad.addEventListener('input', desc)
 checkDel.addEventListener('input', actPresup)
+cancel.addEventListener('click', cancelar)
 

@@ -490,7 +490,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Codigo de Pedido</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">Codigo de PRo</label>
                                     <div class="col-sm-10">
                                     <input type="text" class="form-control" id="infoCod" value="PE22111-1" disabled>
                                     </div>
@@ -507,6 +507,17 @@
                                         <textarea class="form-control" id="infoDescripcion" style="height: 100px" disabled>Lorem ipsum</textarea>
                                     </div>
                                 </div>
+                                <div id="dimensiones" class="row mb-3">
+                                  <label class="col-sm-2 col-form-label">Dimensiones cm2</label>
+                                  <div class="col-sm-5">
+                                    <label for="inputText" class="col-sm-3 col-form-label">Ancho</label>
+                                    <input type="number" class="form-control" id="ancho" disabled>
+                                  </div>
+                                  <div class="col-sm-4">
+                                    <label for="inputText" class="col-sm-3 col-form-label">Alto</label>
+                                    <input type="number" class="form-control" id="alto" disabled>
+                                  </div>
+                                </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Archivos</label>
                                     <div class="col-sm-10">
@@ -520,7 +531,7 @@
                                                 </thead>
                                                 <tbody id="infoArchivos">
                                                     <tr class="">
-                                                        <td scope="row"><a href="/files?codPedido=PE221146&codDet=PE221146-1&filename=Imagen%20de%20WhatsApp%202022-11-05%20a%20las%2011.03.59.jpg">Imagen de WhatsApp 2022-11-05 a las 11.03.59.jpg</a></td>
+                                                        <td scope="row"><a></a></td>
                                                         <td><button type="button" class="btn btn-primary">Descargar</button></td>
                                                     </tr>
                                                 </tbody>
@@ -532,7 +543,7 @@
                                     <label for="inputText" class="col-sm-2 col-form-label">Diseños</label>
                                     <div class="col-sm-10">
                                         <div class="table-responsive">
-                                            <table class="table table-hover">
+                                            <table class="table table-hover" id="tableDiseños">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">Diseños</th>
@@ -541,16 +552,26 @@
                                                 </thead>
                                                 <tbody id="infoDisenios">
                                                     <tr class="">
-                                                        <td scope="row"><a href="/files?codPedido=PE221146&codDet=PE221146-1&filename=Imagen%20de%20WhatsApp%202022-11-05%20a%20las%2011.03.59.jpg">Imagen de WhatsApp 2022-11-05 a las 11.03.59.jpg</a></td>
+                                                        <td scope="row"><a href=""></a></td>
                                                         <td><button type="button" class="btn btn-primary">Descargar</button></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <input type="file" class="form-control" name="diseño" id="diseño">
-                                        <button type="button" id="aggDiseño" class="btn btn-primary">Agregar Diseño</button>
+                                        <form method="post" enctype="multipart/form-data" id="formDiseño">
+                                          <input type="file" class="form-control" name="files" id="files" multiple>
+                                          <button type="button" id="aggDiseño" class="btn btn-primary">Agregar Diseño</button>
+                                        </form>
                                     </div>
                                 </div>
+                                <div class="row mb-3">
+                                  <label for="inputText" class="col-sm-2 col-form-label">Diseño Aprovado</label>
+                                  <div class="col-sm-10">
+                                    <input type="checkbox" value="true" id="checkAprovado" class="form-check-input">
+                                  </div>
+                                
+                                </div>
+            
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Terminados</label>
                                     <div class="col-sm-10">
@@ -580,11 +601,13 @@
                 <tbody>
                 {% for trabajo in trabajos %}
                 
-                  <tr id="" onclick="info('{{trabajo.codProduccion}}')" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">
-                    
+                  <tr id="" onclick="info('{{trabajo.detallePedido_id}}')" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">
+                   
                     <td>{{trabajo.codProduccion}}</td>
                     <td>{{trabajo.producto}}</td>
-                    <td>{{trabajo.fechaEntrega}}</td>
+                    <!--<td>  <input class="form-control border-0 bg-transparent w-auto m-0" type="datetime-local" value="{{trabajo.fechaEntrega}}" disabled>
+                      </td> -->
+                    <td>{{trabajo.fechaEntrega | replace("T"," ") }}</td>
                     <td>{{trabajo.etapa.descripcion}}</td>
                     <td>{{trabajo.cantidad - trabajo.cantidadRestante}}/{{trabajo.cantidad}}</td>
                     <!--<td><button type="button" class="btn btn-secondary" value="{{trabajo.codProduccion}}" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">Info</button></td> -->
@@ -640,7 +663,8 @@
   <script>
     $(document).ready(function () {
         $('#ordenTrabajo').DataTable({
-        language: spanish /*,
+        language: spanish,
+        order: [[2, 'asc']], /*,
         dom: 'Bfrtip',
         buttons: [
             'copy', 'csv', 'excel', 'pdf', 'print'

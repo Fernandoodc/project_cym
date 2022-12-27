@@ -1,20 +1,34 @@
 from fastapi_login import LoginManager
+from fastapi import Response
 from mongo import find_one
 from config import settings
-manager = LoginManager(settings.SECRET_KEY, '/login', use_cookie=True, use_header=False)
+from models import tokenUser
+from datetime import timedelta
+manager = LoginManager( settings.SECRET_KEY, '/login', use_cookie=True, use_header=False, default_expiry=timedelta(hours=8))
+"""manager = LoginManager(
+    secret={"private_key": "your_rsa_key", "password": "your_password_for_the_key"},
+    token_url="...",
+    algorithm="RS256",
+    use_cookie=True
+)"""
 
-"""""
-DB = {
-    'users': {
-        'John Doe': {
-            'name': 'John Doe',
-            'password': 'hunter2',
-            'permitions': [1,2]
-        }
-    }
-}
-"""
 @manager.user_loader()
+def get_user(username: str):
+    """
+    Get a user from the db
+    :param user_id: E-Mail of the user
+    :return: None or the user object
+    """
+    try:
+       
+        user = find_one('usuarios', {'username': username}, {'_id': 0,'username': 1, 'codTipoUsuario': 1})
+        info = tokenUser(username=user['username'], typeUser=user['codTipoUsuario'])
+        return info
+    except Exception as e:
+        print(e, "error")
+        return None
+
+
 def query_user(username: str):
     """
     Get a user from the db
@@ -22,7 +36,7 @@ def query_user(username: str):
     :return: None or the user object
     """
     try:
-        return find_one('usuarios', {'username': username})
+        return find_one('usuarios', {'username': username}, {'_id': 0,'username': 1, 'password': 1, 'codTipoUsuario': 1})
     except Exception as e:
         print(e)
         return None

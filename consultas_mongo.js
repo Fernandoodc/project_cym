@@ -62,3 +62,97 @@ db.usuarios.aggregate(
     ]
 
 )
+
+
+db.pedidos.aggregate(
+    [
+        {
+            $lookup:{
+                from: "detallesPedidos",
+                localField: "codPedido",
+                foreignField: "codPedido",
+                as: "pedido"
+            }
+        },
+        {
+            $unwind: "$pedido"
+        },
+        {
+            $lookup:{
+                from: "produccion",
+                localField: "pedido._id",
+                foreignField: "detallesPedidos_id",
+                as: "produccion"
+            }
+        },
+        {
+            $unwind: "$produccion"
+        },
+        {
+            $match:{
+                $or: [{"fecha": { $gt: "2022-11-17" }}, {"$produccion.etapa.codEtapa": 0}]
+            }
+        },
+        {
+            $project:{
+                codProduccion: "$produccion.CodDetalle",
+                producto: "$producto.descripcion",
+                cantidadRestante: "$produccion.cantidadRestante",
+                cantidad: "$cantidad",
+                descripcion: "$descripcion",
+                fechaEntrega: "$fechaEntrega",
+                etapa:{
+                    codEtapa: "$produccion.etapa.codEtapa",
+                    descripcion: "$produccion.etapa.descripcion"
+                }
+            }
+        }
+    ]
+)
+
+
+db.pedidos.aggregate(
+    [
+        {
+            $lookup:{
+                from: "detallesPedidos",
+                localField: "codPedido",
+                foreignField: "codPedido",
+                as: "pedido"
+            }
+        },
+        {
+            $unwind: "$pedido"
+        },
+        {
+            $lookup:{
+                from: "produccion",
+                localField: "pedido._id",
+                foreignField: "detallesPedidos_id",
+                as: "produccion"
+            }
+        },
+        {
+            $unwind: "$produccion"
+        },
+        {
+            $match:{
+                $or: [{"fecha": { $gt: "2022-11-17" }}, {"produccion.etapa.codEtapa": 0}]
+            }
+        },
+        {
+            $project:{
+                codProduccion: "$produccion.codProduccion",
+                producto: "$producto.descripcion",
+                cantidadRestante: "$produccion.cantidadRestante",
+                cantidad: "$cantidad",
+                descripcion: "$descripcion",
+                fechaEntrega: "$pedido.fechaEntrega",
+                etapa:{
+                    codEtapa: "$produccion.etapa.codEtapa",
+                    descripcion: "$produccion.etapa.descripcion"
+                }
+            }
+        }
+    ]
+)

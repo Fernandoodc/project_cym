@@ -6,6 +6,7 @@ from fastapi import Request, Response, status
 from fastapi import FastAPI
 from fastapi import Path
 from fastapi import Form
+from fastapi import Depends
 from fastapi import UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse
@@ -14,7 +15,7 @@ from fastapi.templating import Jinja2Templates
 from bson import json_util, ObjectId
 import models
 import datetime
-from os import getcwd, mkdir, makedirs
+from os import getcwd, mkdir, makedirs, remove
 from mongoengine import connect
 from pymongo import MongoClient, ReturnDocument, errors
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -25,6 +26,8 @@ from insumos import Insumos
 from login import Login
 from functions import login
 from jose import jwt
+from manager import manager
+from mongo import find, find_one, update_one
 templates = Jinja2Templates(directory="templates")
 app = FastAPI()
 client = MongoClient("localhost")
@@ -38,30 +41,15 @@ app.include_router(Trabajos, prefix="/trabajos")
 app.include_router(Insumos, prefix="/insumos")
 app.include_router(Login)
 
-@app.exception_handler(404)
+@app.exception_handler(status.HTTP_404_NOT_FOUND)
 async def ERROR_404(request: Request, _):
-    return templates.TemplateResponse("pages-error-404.html", context={"request": request})
+    return templates.TemplateResponse("pages-error-404.html", context={"request": request},status_code=404)
 
-@app.exception_handler(401)
+@app.exception_handler(status.HTTP_401_UNAUTHORIZED)
 async def UNAUTHORIZED_401(request: Request, _):
-    return RedirectResponse("/")
+    return RedirectResponse("/login")
     
 
-
-@app.post('/login/', status_code=status.HTTP_202_ACCEPTED)
-async def form_login(usuario:models.user, response: Response):
-    print(usuario)
-    if usuario.username and usuario.password:
-        filtro = models.Usuarios.objects().filter(username=usuario.username)
-        if filtro:
-            datos = models.Usuarios.objects().get(username=usuario.username)
-            #if datos.username==user and datos.password== passw:
-            if datos.username==usuario.username and check_password_hash(datos.password, usuario.password):
-                response.status_code = status.HTTP_202_ACCEPTED
-                return {'msg': 'ok'}
-    #return templates.TemplateResponse('login.html', context={'request': request})
-    response.status_code = status.HTTP_401_UNAUTHORIZED
-    return {'msg': 'rechazado'}
 
 @app.get('/get_users')
 def get_users():
@@ -106,26 +94,15 @@ async def get_products():
     productos= db['productos'].find()
     return json_util._json_convert(productos)
 
-@app.post("/agg/clients")
-def agg_clientes(cliente: models.clientes):
-    db['clientes'].insert_one(json.loads(cliente.json()))
-    return "success"
-    
 
-@app.get('/index')
-async def index(request: Request):
-    token = request.cookies.get("access_token")
-    validation = await login.get_current_user(token=token)
-    return templates.TemplateResponse('index.html', context={'request': request, "userInfo": validation})
+
+@app.get('/')
+async def index(request: Request, user=Depends(manager)):
+    return templates.TemplateResponse('index.html', context={'request': request, "userInfo": user})
    
-@app.post('/index')
-async def index(request: Request):
-    token = request.cookies.get("access_token")
-    validation = await login.get_current_user(token=token)
-    if validation:
-        return templates.TemplateResponse('index.html', context={'request': request, "userInfo": validation})
-    else: 
-        return RedirectResponse("/")
+@app.post('/')
+async def index(request: Request, user=Depends):
+    return templates.TemplateResponse('index.html', context={'request': request, "userInfo": user})
 
 
 
@@ -183,8 +160,34 @@ async def upload_file(response : Response ,files: List[UploadFile] = File(...), 
         db['detallesPedidos'].find_one_and_update({'codPedido': cod_pedido, 'codDetalle': cod_detalle}, {'$set':{'archivos': rutas}})
         return {'msg': 'success', 'path': path, 'files': rutas}
     return 0
+
+@app.post("/upload_diseno", status_code=status.HTTP_200_OK)
+async def upload_disenio(response : Response, files: List[UploadFile] = File(...), cod_pedido: str = Form(...), cod_detalle: str = Form(...), cod_produccion: str = Form(...)):
+    if files:
+        if(cod_pedido == "" or cod_detalle==""):
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {'msg': 'Falta codigo de Pedido'}
+        path = 'archivos/'+ cod_pedido + '/' + cod_detalle + '/diseños'
+        #path = pathlib.Path('/archivos/'+cod_pedido)
+        #path.mkdir(parents=False)
+        makedirs(path, exist_ok=True)
+        rutas = []
+        for file in files:
+            print(file)
+            with open(getcwd() + '/'+ path + '/' + file.filename, "wb") as myfile:
+            #with open(getcwd() + "/archivos/" + file.filename, "wb") as myfile:
+                content = await file.read()
+                myfile.write(content)
+                myfile.close()
+                rutas.append({'ruta': path + '/' + file.filename, 'descripcion': file.filename})
+        #db['produccion'].find_one_and_update({'codProduccion': cod_produccion}, {'$set':{ "$push": {'diseños': rutas}}})
+        for ruta in rutas:
+            db['produccion'].update_one({'codProduccion': cod_produccion}, {"$push": {"diseños": ruta}})
+        return {'msg': 'success', 'path': path, 'files': rutas}
+    return 0
+
 @app.get("/files")
-async def upload(response: Response, codPedido:str, codDet: str, filename:str):
+async def upload(response: Response, codPedido:str, codDet: str, filename:str, user=Depends(manager)):
     try:
         file = open(getcwd() + '/archivos/'+ codPedido + '/' + codDet + "/" + filename)
         file.close()
@@ -202,3 +205,37 @@ async def upload(response: Response, codPedido:str, codDet: str, filename:str):
         #return 0
     return FileResponse(getcwd() + '/archivos/'+ codPedido + '/' + codDet + "/" + filename)
 
+@app.get("/get_disenios")
+async def getDisenios(response:Response, ruta: str, user=Depends(manager)):
+    try:
+        file = open(ruta)
+        file.close()
+    except Exception as e:
+        print(e)
+        return "Archivo con encontrado"
+    return FileResponse(getcwd() + '/'+ ruta)
+
+@app.get('/nacionalidades')
+async def nacionalidades():
+    try:
+        nacs = find_one('nacionalidades')
+        print(nacs['_id'])
+    except Exception as e:
+        print(e)
+        return 0
+    return json_util._json_convert(nacs)
+
+@app.delete("/delete_disenio")
+async def deleteDisenio(response: Response, filename : str, cod_pedido: str, cod_detalle: str, cod_produccion: str):
+    path = '/archivos/'+ cod_pedido + '/' + cod_detalle + '/diseños/'+ filename
+    try:
+        remove(getcwd() + path)
+        await update_one('produccion', {'codProduccion': cod_produccion}, {"$pull": {"diseños": {"descripcion": filename}}})
+        return JSONResponse(content={
+            "removed": True
+        }, status_code=200)
+    except FileNotFoundError:
+        return JSONResponse(content={
+            "removed": False,
+            "message": "File not found"
+        }, status_code=404)

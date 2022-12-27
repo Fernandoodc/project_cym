@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Compra de Insumos{% endblock %}
+{% block css %}
+<link href="{{url_for('static', path='css/select2.min.css')}}" rel="stylesheet">
+<link rel="stylesheet" href="{{url_for('static', path='css/select2-bootstrap-5-theme.min.css')}}" />
+{% endblock %}
+{% block content %}
+
+<div class="pagetitle">
+    <h1>Registrar Compra de Insumos</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+        <li class="breadcrumb-item">Insumos</li>
+        <li class="breadcrumb-item active">Compra de Insumos</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Datos</h5>
+
+            <!-- General Form Elements -->
+            <form id="aggPedido" enctype="multipart/form-data" method="post">
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Proveedor</label>
+                <div class="col-sm-8">
+                    <select class="form-select proveedores" id="proveedores" aria-label="Default select example">
+                      <option value="">Proveedor 1</option>
+                      <option value="">Proveedor 2</option>
+                      <option value="">Proveedor 3</option>
+                      <option value="">Proveedor 4</option>
+                      <option value="">Proveedor 5</option>
+                      <option value="">Proveedor 6</option>
+                    </select>
+                  </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="newProveedor" data-bs-target="#newProveedor-modal">
+                      Nuevo Proveedor
+                    </button>
+                    <div class="modal fade" id="newProveedor-modal" tabindex="-1">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Agregar Nuevo Proveedor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div >
+                                  <div class="alert" id="alertNuevoProveedor"></div>
+                                  <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Nombre:</label>
+                                      <div class="col-sm-10">
+                                        <input type="text" id="nombreProveedor" class="form-control" required>
+                                      </div>
+                                  </div>
+                                  <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Direccion</label>
+                                      <div class="col-sm-10">
+                                        <input type="text"  id="direccionProveedor" class="form-control" required>
+                                      </div>
+                                  </div>
+                                  <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Celular</label>
+                                    <div class="col-sm-10">
+                                      <input type="text"  id="celularProveedor" class="form-control">
+                                    </div>
+                                </div>
+                                  <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Email</label>
+                                      <div class="col-sm-10">
+                                        <input type="email" id="emailProveedor" class="form-control">
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" id="cancelarNewProveedor" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                      <button type="button" id="aggProveedor" class="btn btn-success">Guardar</button>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End Extra Large Modal-->
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-2 col-form-label">Facturas</label>
+                <div class="col-sm-8">
+                    <select class="form-select facturas" id="facturas" aria-label="Default select example">
+                        <option value="">Factura 1</option>
+                        <option value="">Factura 2</option>
+                        <option value="">Factura 3</option>
+                        <option value="">Factura 4</option>
+                        <option value="">Factura 5</option>
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="newFactura" data-bs-target="#newFactura-modal">
+                      Nueva Factura
+                    </button>
+                    <div class="modal fade" id="newFactura-modal" tabindex="-1">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Agregar Nueva Factura</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div >
+                                <div class="alert" id="alertNuevoProveedor"></div>
+                                <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Proveedor:</label>
+                                      <div class="col-sm-10">
+                                        <input type="text" class="form-control" disabled>
+                                      </div>
+                                  </div>
+                                <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Numero de Factura:</label>
+                                      <div class="col-sm-10">
+                                        <input type="text"  id="newNumeroFactura" class="form-control" required>
+                                      </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Fecha:</label>
+                                    <div class="col-sm-10">
+                                      <input type="date"  id="newFechaFactura" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                      <button type="button" id="cancelarNewFactura" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                      <button type="button" id="aggFactura" class="btn btn-success">Guardar</button>
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End Extra Large Modal-->
+                </div>
+              </div>
+              <div class="row mb-3">
+                  <label for="inputText" class="col-sm-2 col-form-label">Fecha:</label>
+                  <div class="col-sm-3">
+                    <input type="date" id="fecha" class="form-control" disabled>
+                  </div>
+              </div>
+
+              <!-- informacion del los insumos -->
+              <div class="row mb-3" id="div-insumo">
+                  <label class="col-sm-2 col-form-label">Insumo:</label>
+                  <div class="col-sm-8">
+                    <select class="form-select insumo" id="insumo" aria-label="Default select example">
+                      {% for insumo in insumos %}
+                      <option value="{{insumo.codInsumo}}">{{insumo.codInsumo}} - {{insumo.descripcion}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="newInsumo" data-bs-target="#newInsumo-modal">
+                      Nuevo Insumo
+                    </button>
+                    <div class="modal fade" id="newInsumo-modal" tabindex="-1">
+                      <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Agregar Nuevo Insumo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div >
+                                <div class="alert" id="alertNuevoProveedor"></div>
+                                <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Cod Insumo:</label>
+                                      <div class="col-sm-10">
+                                        <input type="text" class="form-control" disabled>
+                                      </div>
+                                </div>
+                                <div class="row mb-3">
+                                      <label for="inputText" class="col-sm-2 col-form-label">Descripción:</label>
+                                      <div class="col-sm-10">
+                                        <input type="text"  id="descripcionInsumo" class="form-control" required>
+                                      </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Stock Mínimo</label>
+                                    <div class="col-sm-10">
+                                      <input type="number" min="0"  id="newFechaFactura" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Tipo:</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-select form-select-sm" name="tipoInsumo" id="tipoInsumo">
+                                            <option selected>Consumible</option>
+                                            <option value="">No consumible</option>
+                                            <option value="">Uso Interno</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                      <button type="button" id="cancelarNewInsumo" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                      <button type="button" id="aggInsumo" class="btn btn-success">Guardar</button>
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div><!-- End Extra Large Modal-->
+                </div>
+                  
+              </div>
+              <div id="calculo_precio">
+              </div>
+              <div class="row mb-3">
+                    <label  class="col-sm-2 col-form-label">Precio Unitario</label>
+                    <div class="col-sm-3">
+                        <input type="number" id="precioUnitario" class="form-control">
+                    </div>
+                    <label class="col-sm-2 col-f orm-label">Cantidad</label>
+                    <div class="col-sm-3">
+                    <input type="number" id="cantidad" class="form-control">
+                    </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-10">
+                  <button type="button" class="btn btn-primary" id="agregar"><i class="ri-add-line"></i></button>
+                  <button type="button" class="btn btn-secondary" id="cancelar">Limpiar</button>
+                  <button type="button" class="btn btn-danger" id="cancelar">Cancelar</button>
+                </div>
+              </div>
+            </form>
+            <!-- End General Form Elements -->
+            <div class="card table-responsive">
+              <div class="card-body">
+                <h5 class="card-title">Lista</h5>
+                
+                <!-- Table with hoverable rows -->
+                
+                <table class="table table-hover" id="listaPedidos">
+                  <thead>
+                    <tr>
+                      <th scope="col">Cod</th>
+                      <th scope="col">Descripción</th>
+                      <th scope="col">Precio Unit.</th>
+                      <th scope="col">Cantidad</th>
+                      <th scope="col">Total</th>
+                      <th scope="col">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bodyLista">
+                  </tbody>
+                </table>
+                <p class="text"><b>Total:</b> <span class="total">0</span>  </p>
+                <!-- End Table with hoverable rows -->
+  
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/errores.js') }}"></script>
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/jquery.slim.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/select2.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/axios.js') }}"></script>
+<script>
+  $(document).ready(function() {
+      $('.proveedores').select2({
+        theme: 'bootstrap-5'
+      });
+      $('.facturas').select2({
+        theme: 'bootstrap-5'
+      });
+      $('.insumo').select2({
+        theme: 'bootstrap-5'
+      });
+  });
+</script>
+{% endblock %}

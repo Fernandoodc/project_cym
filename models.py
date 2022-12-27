@@ -18,12 +18,13 @@ class user(BaseModel):
     password: str
 
 class clientes(BaseModel):
-    documento: int
+    documento: str
     nombre: str
     apellido: str
     email: str
     celular: str
     direccion: str
+    nacionalidad: str
     saldo: int = 0
 
 #productos
@@ -71,6 +72,10 @@ class medidas(BaseModel):
     alto : float = 0
     profundidad : float = 0
 
+class delivery(BaseModel):
+    solicitado : bool = False
+    direccion : str = ''
+
 class detPedido(BaseModel):
     codPedido : str
     codProducto : str
@@ -78,4 +83,8 @@ class detPedido(BaseModel):
     descripcion : str = ""
     cantidad : int
     fechaEntrega : str
-    delivery : bool
+    delivery : delivery
+
+class aprovacion(BaseModel):
+    estado: bool
+    codProduccion: str

@@ -29,6 +29,8 @@
   <!-- Template Main CSS File -->
   <link href="{{url_for('static', path='css/style.css')}}" rel="stylesheet">
   <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+  <link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
 
   <!-- =======================================================
   * Template Name: NiceAdmin - v2.3.1
@@ -478,8 +480,9 @@
 
           <div class="card">
             <div class="card-body">
-              
-            <div class="table-responsive-sm mt-3">
+          
+            
+            <div class="table-responsive mt-3">
                 <!-- Default Table -->
                 <div class="modal fade" id="detallePedido" tabindex="-1">
                     <div class="modal-dialog modal-xl">
@@ -549,7 +552,10 @@
                       </div>
                     </div>
                 </div>
-              <table class="table table-hover display" id="listaPedidos">
+              <table class="table 
+              table-hover	
+              table-borderless
+              align-middle display nowrap" id="listaPedidos">
                 <thead>
                   <tr>
                     <th scope="col">Cod.</th>
@@ -565,7 +571,7 @@
                     
                   <tr>
                     
-                    <td data-bs-toggle="modal" data-bs-target="#detallePedido">PE22111-1</td>
+                    <td data-bs-toggle="modal" data-bs-target="#detallePedido">PE22111</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">Fernando Fernández</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">000000 - Tarjetas Personales</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">05-11-2022</td>
@@ -575,7 +581,7 @@
                   </tr>
                   <tr>
                     
-                    <td data-bs-toggle="modal" data-bs-target="#detallePedido">PE22111-2</td>
+                    <td data-bs-toggle="modal" data-bs-target="#detallePedido">PE22111</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">Fernando Fernández</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">000000 - Sublimación de Taza</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">04-11-2022</td>
@@ -585,7 +591,7 @@
                   </tr>
                   <tr>
                     
-                    <td data-bs-toggle="modal" data-bs-target="#detallePedido">PE22111-3</td>
+                    <td data-bs-toggle="modal" data-bs-target="#detallePedido">PE22112</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">Fernando Fernández</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">000000 - Stickers</td>
                     <td data-bs-toggle="modal" data-bs-target="#detallePedido">05-11-2022</td>
@@ -636,10 +642,16 @@
   <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
   <script src="{{ url_for('static', path='/js/main.js') }}"></script>
   <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+  <script src="/static/js/dataTables.responsive.min.js"></script>
+  <script src="/static/js/dataTables.rowGroup.min.js" ></script>
   <script>
     $(document).ready(function () {
         $('#listaPedidos').DataTable({
         language: spanish,
+        order: [[0, 'desc']],
+        rowGroup: {
+            dataSrc: 0
+        }
          });
     });
     console.log(spanish)

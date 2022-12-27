@@ -13,13 +13,40 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from config import settings
 from jose import jwt
 from functions import login
+from manager import manager, query_user
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/login/token")
 
 templates = Jinja2Templates(directory="templates")
 
 Login = APIRouter(tags=['login'])
+@Login.get('/login', status_code=status.HTTP_401_UNAUTHORIZED)
+async def login(request: Request):
+    error = []
+    return templates.TemplateResponse('login.html', context={'request': request, 'error': error}, status_code=status.HTTP_401_UNAUTHORIZED)
 
+@Login.post('/login')
+async def create_token(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
+    username = form_data.username
+    password = form_data.password
+    error = []
+    try:
+        user = query_user(username)
+        if user != None:
+            if check_password_hash(user['password'], password):
+                access_token = manager.create_access_token(data={'sub': username, 'typeUser': user['codTipoUsuario']})
+                response = RedirectResponse('/')
+                manager.set_cookie(response=response, token=access_token)
+                return response
+        error.append('Usuario o Contraseña Incorrecta')
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+    except Exception as e:
+        print(e)
+        error.append('Ocurrió un error interno')
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    return templates.TemplateResponse('login.html', context={'request': request, 'error': error})
+
+"""""
 @Login.get("/")
 async def form_login(request: Request):
     token = request.cookies.get("access_token")
@@ -49,3 +76,4 @@ def retrieve_token_for_authenticated_user(request:Request, response: Response, f
         error.append("Ocurrió un Error Interno")
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     return templates.TemplateResponse('login.html', context={'request': request, 'error': error})
+"""

@@ -28,7 +28,7 @@
 
   <!-- Template Main CSS File -->
   <link href="{{url_for('static', path='css/style.css')}}" rel="stylesheet">
-
+  {% block css %}{% endblock %}</head>
   <!-- =======================================================
   * Template Name: NiceAdmin - v2.3.1
   * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
@@ -159,7 +159,7 @@
 
             <li class="message-item">
               <a href="#">
-                <img src="assets/img/messages-1.jpg" alt="" class="rounded-circle">
+                <img src="/static/img/messages-1.jpg" alt="" class="rounded-circle">
                 <div>
                   <h4>Maria Hudson</h4>
                   <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
@@ -173,7 +173,7 @@
 
             <li class="message-item">
               <a href="#">
-                <img src="assets/img/messages-2.jpg" alt="" class="rounded-circle">
+                <img src="/static/img/messages-2.jpg" alt="" class="rounded-circle">
                 <div>
                   <h4>Anna Nelson</h4>
                   <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
@@ -187,7 +187,7 @@
 
             <li class="message-item">
               <a href="#">
-                <img src="assets/img/messages-3.jpg" alt="" class="rounded-circle">
+                <img src="/static/img/messages-3.jpg" alt="" class="rounded-circle">
                 <div>
                   <h4>David Muldon</h4>
                   <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
@@ -210,7 +210,7 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+            <img src="/static/img/profile-img.jpg" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">{{userInfo.username}}</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -274,36 +274,31 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link collapsed active" href="/index">
+        <a class="nav-link collapsed active" id="inicio" href="/">
           <i class="bi bi-grid"></i>
           <span>Inicio</span>
         </a>
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#pedidos-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-menu-button-wide"></i><span>Pedidos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="components-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <ul id="pedidos-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/pedidos/nuevo_pedido">
+            <a href="/pedidos/nuevo_pedido" id="nuevo_pedido">
               <i class="bi bi-circle"></i><span>Nuevo Pedido</span>
             </a>
           </li>
           <li>
-            <a href="/pedidos/lista_pedidos">
+            <a href="/pedidos/lista_pedidos" id="lista_pedidos">
               <i class="bi bi-circle"></i><span>Lista de Pedidos</span>
             </a>
           </li>
           
           <li>
-            <a href="/pedidos/presupuestos">
+            <a href="/pedidos/presupuestos" id="presupuestos">
               <i class="bi bi-circle"></i><span>Presupuestos</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-buttons.html">
-              <i class="bi bi-circle"></i><span>Buttons</span>
             </a>
           </li>
           
@@ -311,12 +306,12 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#trabajos-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse"></i><span>Trabajos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="tables-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <ul id="trabajos-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/trabajos/orden_trabajo">
+            <a href="/trabajos/orden_trabajo" id="orden_trabajo">
               <i class="bi bi-circle"></i><span>Orden de Trabajo</span>
             </a>
           </li>
@@ -333,12 +328,12 @@
         </a>
         <ul id="clientes-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/clientes" class="active">
+            <a href="clientes/clientes" class="active" id="clientes">
               <i class="bi bi-circle"></i><span>Lista de Clientes</span>
             </a>
           </li>
           <li>
-            <a href="/cliente/nuevo_cliente">
+            <a href="/cliente/nuevo_cliente" id="nuevo_cliente">
               <i class="bi bi-circle"></i><span>Nuevo Cliente</span>
             </a>
           </li>
@@ -346,20 +341,20 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#insumos-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-bar-chart"></i><span>Insumos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="insumos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/insumos/insumos">
+            <a href="/insumos/insumos" id="insumos">
               <i class="bi bi-circle"></i><span>Lista de Insumos</span>
             </a>
           </li>
           <li>
-            <a href="/insumos/nuevo/insumo">
-              <i class="bi bi-circle"></i><span>ApexCharts</span>
+            <a href="/insumos/compra_insumos">
+              <i class="bi bi-circle"></i><span>Registrar compra de Insumos</span>
             </a>
-          </li>>
+          </li>
         </ul>
       </li><!-- End Charts Nav -->
 
@@ -369,18 +364,13 @@
         </a>
         <ul id="equipos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/equipos/equipos">
+            <a href="/equipos/equipos" id="equipos">
               <i class="bi bi-circle"></i><span>Lista de Equipos</span>
             </a>
           </li>
           <li>
-            <a href="/equipos/nuevo_equipos">
+            <a href="/equipos/nuevo_equipo" id="nuevo_equipo">
               <i class="bi bi-circle"></i><span>Nuevo Equipo</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-boxicons.html">
-              <i class="bi bi-circle"></i><span>Boxicons</span>
             </a>
           </li>
         </ul>
@@ -394,17 +384,17 @@
         </a>
         <ul id="reportes-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/equipos/equipos">
-              <i class="bi bi-circle"></i><span>reporte 1</span>
+            <a href="/reportes/insumos_utilizados" id="insumos_utilizados">
+              <i class="bi bi-circle"></i><span>Insumos Utilizados</span>
             </a>
           </li>
           <li>
-            <a href="/equipos/nuevo_equipos">
+            <a href="/reportes/insumos_perdidos" id="insumos_perdidos">
               <i class="bi bi-circle"></i><span>reporte 2</span>
             </a>
           </li>
           <li>
-            <a href="icons-boxicons.html">
+            <a href="/reportes/sin_entregar" id="sin_entregar">
               <i class="bi bi-circle"></i><span>reporte 3</span>
             </a>
           </li>
@@ -412,17 +402,17 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#users-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#usuarios-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-gem"></i><span>Usuarios</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="users-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="usuarios-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/usuario/usuarios">
+            <a href="/usuario/usuarios" id="usuarios">
               <i class="bi bi-circle"></i><span>Lista de Usuarios</span>
             </a>
           </li>
           <li>
-            <a href="/usuarios/nuevo_usuario">
+            <a href="/usuarios/nuevo_usuario" id="nuevo_usuario">
               <i class="bi bi-circle"></i><span>Agregar Usuario</span>
             </a>
           </li>
