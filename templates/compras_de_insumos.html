@@ -31,12 +31,9 @@
                 <label for="inputText" class="col-sm-2 col-form-label">Proveedor</label>
                 <div class="col-sm-8">
                     <select class="form-select proveedores" id="proveedores" aria-label="Default select example">
-                      <option value="">Proveedor 1</option>
-                      <option value="">Proveedor 2</option>
-                      <option value="">Proveedor 3</option>
-                      <option value="">Proveedor 4</option>
-                      <option value="">Proveedor 5</option>
-                      <option value="">Proveedor 6</option>
+                      {% for proveedor in proveedores %} 
+                        <option value="{{proveedor._id}}">{{proveedor.nombre}}</option>
+                      {% endfor %}
                     </select>
                   </div>
                 <div class="col-sm-2">
@@ -53,6 +50,12 @@
                           <div class="modal-body">
                             <div >
                                   <div class="alert" id="alertNuevoProveedor"></div>
+                                  <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">RUC:</label>
+                                    <div class="col-sm-10">
+                                      <input type="text" id="rucProveedor" class="form-control" required>
+                                    </div>
+                                </div>
                                   <div class="row mb-3">
                                       <label for="inputText" class="col-sm-2 col-form-label">Nombre:</label>
                                       <div class="col-sm-10">
@@ -112,11 +115,11 @@
                           </div>
                           <div class="modal-body">
                             <div >
-                                <div class="alert" id="alertNuevoProveedor"></div>
+                                <div class="alert" id="alertNuevaFactura"></div>
                                 <div class="row mb-3">
                                       <label for="inputText" class="col-sm-2 col-form-label">Proveedor:</label>
                                       <div class="col-sm-10">
-                                        <input type="text" class="form-control" disabled>
+                                        <input type="text" id="infoProveedor" class="form-control" disabled>
                                       </div>
                                   </div>
                                 <div class="row mb-3">
@@ -160,7 +163,7 @@
                     </select>
                   </div>
                   <div class="col-sm-2">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="newInsumo" data-bs-target="#newInsumo-modal">
+                    <button type="button" class="btn btn-primary" id="btn-newInsumo"  data-bs-toggle="modal" id="newInsumo" data-bs-target="#newInsumo-modal">
                       Nuevo Insumo
                     </button>
                     <div class="modal fade" id="newInsumo-modal" tabindex="-1">
@@ -172,13 +175,7 @@
                           </div>
                           <div class="modal-body">
                             <div >
-                                <div class="alert" id="alertNuevoProveedor"></div>
-                                <div class="row mb-3">
-                                      <label for="inputText" class="col-sm-2 col-form-label">Cod Insumo:</label>
-                                      <div class="col-sm-10">
-                                        <input type="text" class="form-control" disabled>
-                                      </div>
-                                </div>
+                                <div class="alert" id="alertNuevoInsumo"></div>
                                 <div class="row mb-3">
                                       <label for="inputText" class="col-sm-2 col-form-label">Descripción:</label>
                                       <div class="col-sm-10">
@@ -188,22 +185,29 @@
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Stock Mínimo</label>
                                     <div class="col-sm-10">
-                                      <input type="number" min="0"  id="newFechaFactura" class="form-control">
+                                      <input type="number" min="0"  id="stockMin" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Tipo:</label>
                                     <div class="col-sm-10">
                                         <select class="form-select form-select-sm" name="tipoInsumo" id="tipoInsumo">
-                                            <option selected>Consumible</option>
-                                            <option value="">No consumible</option>
-                                            <option value="">Uso Interno</option>
+                                          {% for tipo in tiposInsumos %}
+                                            <option value="{{tipo._id}}">{{tipo.descripcion}}</option>
+                                          {% endfor %}
                                         </select>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                      <button type="button" id="cancelarNewInsumo" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                      <button type="button" id="aggInsumo" class="btn btn-success">Guardar</button>
+                                <div class="row mb-3" id="div-codInsumo">
+                                  <label for="inputText" class="col-sm-2 col-form-label">Cod Insumo:</label>
+                                  <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="codInsumo" disabled>
+                                  </div>
+                                </div>
+                                <div class="modal-footer" id="modal-footer-nuevoInsumo">
+                                  <button type="button" id="cancelarNewInsumo" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                  <button type="button" id="aggInsumo" class="btn btn-success">Guardar</button>
+                                  <button type="button" class="btn btn-primary" id="btn-ok">Ok</button>
                                 </div>
                               </div>
                           </div>
@@ -228,8 +232,7 @@
               <div class="row mb-3">
                 <div class="col-sm-10">
                   <button type="button" class="btn btn-primary" id="agregar"><i class="ri-add-line"></i></button>
-                  <button type="button" class="btn btn-secondary" id="cancelar">Limpiar</button>
-                  <button type="button" class="btn btn-danger" id="cancelar">Cancelar</button>
+                  <button type="button" class="btn btn-secondary" id="limpiar">Limpiar</button>
                 </div>
               </div>
             </form>
@@ -240,11 +243,11 @@
                 
                 <!-- Table with hoverable rows -->
                 
-                <table class="table table-hover" id="listaPedidos">
+                <table class="table table-hover" id="listaCompras">
                   <thead>
                     <tr>
-                      <th scope="col">Cod</th>
-                      <th scope="col">Descripción</th>
+                      <th scope="col">Factura</th>
+                      <th scope="col">Insumo</th>
                       <th scope="col">Precio Unit.</th>
                       <th scope="col">Cantidad</th>
                       <th scope="col">Total</th>
@@ -254,7 +257,7 @@
                   <tbody id="bodyLista">
                   </tbody>
                 </table>
-                <p class="text"><b>Total:</b> <span class="total">0</span>  </p>
+                <p class="text"><b>Total:</b> <span class="total" id="total">0</span>  </p>
                 <!-- End Table with hoverable rows -->
   
               </div>
@@ -270,9 +273,10 @@
 {% block scripts %}
 <script src="{{ url_for('static', path='/js/errores.js') }}"></script>
 <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-<script src="{{ url_for('static', path='/js/jquery.slim.min.js') }}"></script>
+<!-- <script src="{{ url_for('static', path='/js/jquery.slim.min.js') }}"></script> -->
 <script src="{{ url_for('static', path='/js/select2.min.js') }}"></script>
-<script src="{{ url_for('static', path='/js/axios.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="{{ url_for('static', path='/js/insumos.js') }}"></script>
 <script>
   $(document).ready(function() {
       $('.proveedores').select2({

@@ -3,7 +3,6 @@ from turtle import st
 from typing import List
 from mongoengine import Document, StringField
 from pydantic import BaseModel
-import datetime
 
 class tokenUser(BaseModel):
     username: str
@@ -88,3 +87,27 @@ class detPedido(BaseModel):
 class aprovacion(BaseModel):
     estado: bool
     codProduccion: str
+
+class proveedores(BaseModel):
+    ruc: str
+    nombre: str
+    direccion: str = ''
+    celular: str = ''
+    email: str = ''
+
+class facturas(BaseModel):
+    fecha: str
+    numeroFactura : str
+    total: int = 0
+    Proveedores_id: str
+
+class insumo(BaseModel):
+    descripcion : str
+    stockMin : int
+    tipoInsumo_id : int
+
+class compraInsumo(BaseModel):
+    cantidad : int
+    precioUnitario : int
+    codInsumo : str
+    FacturasProveedores_id : str

@@ -1,4 +1,3 @@
-import pathlib
 import json
 from typing import List
 from fastapi.staticfiles import StaticFiles
@@ -24,6 +23,7 @@ from pedidos import Pedidos
 from trabajos import Trabajos
 from insumos import Insumos
 from login import Login
+from proveedores import Proveedores
 from functions import login
 from jose import jwt
 from manager import manager
@@ -32,13 +32,14 @@ templates = Jinja2Templates(directory="templates")
 app = FastAPI()
 client = MongoClient("localhost")
 db = client['cym']
-connect(db="cym", host="localhost", port=27017)
+#connect(db="cym", host="localhost", port=27017)
 app.mount("/static", StaticFiles(directory="assets"), name="static")
 
 app.include_router(Clientes, prefix="/clientes")
 app.include_router(Pedidos, prefix="/pedidos")
 app.include_router(Trabajos, prefix="/trabajos")
 app.include_router(Insumos, prefix="/insumos")
+app.include_router(Proveedores, prefix='/proveedores')
 app.include_router(Login)
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
@@ -74,11 +75,9 @@ def agg_user(usuario:models.user):
     print(json_util.dumps(id))
 
 #---------Productos---------
-
 @app.post("/agg/product", status_code=status.HTTP_201_CREATED)
 async def agg_product(product: models.product):
     data = json.loads(product.json())
-    #for i in range(len(data['variaciones']['insumosPorVariacion'])):
     for i in range(len(data['insumos'])):
         #falta comprovación de si existe ese insumo en la bd
             #data['variaciones']['insumosPorVariacion'][i]['insumo_id'] = {
@@ -95,7 +94,6 @@ async def get_products():
     return json_util._json_convert(productos)
 
 
-
 @app.get('/')
 async def index(request: Request, user=Depends(manager)):
     return templates.TemplateResponse('index.html', context={'request': request, "userInfo": user})
@@ -104,37 +102,6 @@ async def index(request: Request, user=Depends(manager)):
 async def index(request: Request, user=Depends):
     return templates.TemplateResponse('index.html', context={'request': request, "userInfo": user})
 
-
-
-#pedidos ---------------------
-
-#no se usa por el momento
-@app.post('/agg_pedido', status_code=status.HTTP_201_CREATED)
-async def agg_pedido(pedido: models.pedidos, response: Response):
-    if(pedido.cliente_id==""):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return {'msg': 'error'}
-    date = datetime.datetime.now().strftime("%y%m")
-    seq = db['seq'].find_one_and_update({"date": date}, {"$inc":{"seq": 1}}, upsert = True, return_document=ReturnDocument.AFTER)
-    resp = db['pedidos'].insert_one({
-        "codPedido": "PE"+str(date)+str(seq['seq']),
-        "fecha": pedido.fecha,
-        "subTotal": pedido.subtotal,
-        "descuento": pedido.descuento,
-        "presupuesto": pedido.presupuesto,
-        "cliente_id": ObjectId(pedido.cliente_id)      
-    })
-    return {'codPedido', resp.CodPedido}                
-
-#@app.post('/sum_presu_pedido') #sumar nuevo valores al presupuesto y el subtotal del pedido
-
-
-
-@app.get("/pruebas")
-async def pruebas(request: Request, response: Response):
-    response.set_cookie(key="gg", value="ff")
-    
-    return templates.TemplateResponse("pruebas.html", context={"request": request, "msg": "hola"})
 
 @app.post("/upload", status_code=status.HTTP_200_OK)
 async def upload_file(response : Response ,files: List[UploadFile] = File(...), cod_pedido: str = Form(...), cod_detalle: str = Form(...)):

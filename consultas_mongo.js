@@ -156,3 +156,11 @@ db.pedidos.aggregate(
         }
     ]
 )
+
+db.insumos.aggregate([
+    {
+        $project:{
+           "codInsumo": {$toInt: "$codInsumo"}
+        }
+    }
+])

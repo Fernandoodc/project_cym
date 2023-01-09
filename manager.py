@@ -5,12 +5,6 @@ from config import settings
 from models import tokenUser
 from datetime import timedelta
 manager = LoginManager( settings.SECRET_KEY, '/login', use_cookie=True, use_header=False, default_expiry=timedelta(hours=8))
-"""manager = LoginManager(
-    secret={"private_key": "your_rsa_key", "password": "your_password_for_the_key"},
-    token_url="...",
-    algorithm="RS256",
-    use_cookie=True
-)"""
 
 @manager.user_loader()
 def get_user(username: str):

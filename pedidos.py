@@ -44,7 +44,7 @@ async def nuevo_pedido(request: Request, user=Depends(manager)):
 async def createPedido(pedido: models.basePedido, response: Response, user=Depends(manager)):
     date = datetime.datetime.now().strftime("%y%m")
     try:
-        seq = db['seq'].find_one_and_update({"date": date}, {"$inc":{"seq": 1}}, upsert = True, return_document=ReturnDocument.AFTER)
+        seq = db['seqPedidos'].find_one_and_update({"date": date}, {"$inc":{"seq": 1}}, upsert = True, return_document=ReturnDocument.AFTER)
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {'msg': e}
@@ -157,7 +157,6 @@ async def aggDetPedido(response: Response, detalle:models.detPedido, user=Depend
 
 @Pedidos.delete("/eliminar_det")
 async def eliminarDet(codDetalle : str):
-    print('----------------------\n----------------------\n----------------------\n----------------------\n----------------------\n')
     db['detallesPedidos'].delete_one({'codDetalle': codDetalle})
     return 'success'
 

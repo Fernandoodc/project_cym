@@ -39,18 +39,18 @@ def agreggate(coleccion, condicion):
 
 def insert_one(coleccion, contenido):
     try:
-        db[coleccion].insert_one(contenido)
+        return db[coleccion].insert_one(contenido)
     except Exception as e:
         print(e)
 
 async def delete_one(coleccion: str, condicion = {}):
-    db[coleccion].delete_one(condicion)
+    return db[coleccion].delete_one(condicion)
 
 async def delete_many(coleccion: str, condicion = {}):
-    db[coleccion].delete_many(condicion)
+    return db[coleccion].delete_many(condicion)
 
 async def update_one(coleccion: str, condicion = {}, datos = {}):
-    db[coleccion].update_one(condicion, datos)
+    return db[coleccion].update_one(condicion, datos)
 
-async def find_one_and_update(coleccion : str, condiccion = {}, datos = {}):
-    db[coleccion].find_one_and_update(condiccion, {'$set':datos})
+async def find_one_and_update(coleccion : str, condiccion = {}, datos = {}, returnDocument = False, upsert = False):
+    return db[coleccion].find_one_and_update(condiccion, {'$set':datos}, return_document=returnDocument, upsert=upsert)

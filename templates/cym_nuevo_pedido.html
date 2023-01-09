@@ -292,9 +292,9 @@
 {% block scripts %}
 <script src="{{ url_for('static', path='/js/errores.js') }}"></script>
 <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-<script src="{{ url_for('static', path='/js/jquery.slim.min.js') }}"></script>
+<!-- <script src="{{ url_for('static', path='/js/jquery.slim.min.js') }}"></script> -->
 <script src="{{ url_for('static', path='/js/select2.min.js') }}"></script>
-<script src="{{ url_for('static', path='/js/axios.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
 <script src="{{ url_for('static', path='/js/func_pedidos.js') }}"></script>
 <script>
   const productos = {{productos | tojson}}
