@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Nuevo Equipo{% endblock %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <h1>Agregar Equipo</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+            <li class="breadcrumb-item">Equipos</li>
+            <li class="breadcrumb-item active">Nuevo Equipo</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Datos</h5>
+                    <!-- General Form Elements -->
+                    <form id="aggEquipos">
+                        <div class="row mb-3">
+                            <label for="numeroSerie" class="col-form-label col-sm-2">Número de serie<span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="numeroSerie" id="numeroSerie"
+                                    aria-describedby="" placeholder="" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="div_marcas">
+                            <label class="col-sm-2 col-form-label">Marca<span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                        <select class="form-select insumos-select" id="marca"
+                                            aria-label="Default select example">
+                                            {% for marca in marcas %}
+                                            <option value="{{marca._id['$oid']}}">{{marca.descripcion}}</option>
+                                            {% endfor %}
+                                            <option value="other">Otro</option>
+                                        </select>
+                                        <div class="row otherMarca">
+                                            <div class="col sm-12">
+                                                <div class="form-floating mb-3 mt-3">
+                                                    <input type="text" class="form-control" name="otherMarca"
+                                                        id="otherMarca" placeholder="Marca">
+                                                    <label for="otherMarca">Marca</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="modelo" class="col-form-label col-sm-2">Modelo<span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="text"
+                                    class="form-control" name="modelo" id="modelo" aria-describedby="" placeholder="">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="fecha" class="col-form-label col-sm-2">Fecha de Adquisición<span class="text-danger">*</span></label>
+                            <div class="col-sm-4">
+                                <input type="date"
+                                    class="form-control" name="fecha" id="fecha" aria-describedby="" placeholder="">
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="div_tipoEquipo">
+                            <label class="col-sm-2 col-form-label">Tipo de Equipo<span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                        <select class="form-select insumos-select" id="tipoEquipo"
+                                            aria-label="Default select example">
+                                            {% for tipo in tiposEquipos %}
+                                            <option value="{{tipo._id['$oid']}}">{{tipo.descripcion}}</option>
+                                            {% endfor %}
+                                            <option value="other">Otro</option>
+                                        </select>
+                                        <div class="row otherTipo">
+                                            <div class="col sm-12">
+                                                <div class="form-floating mb-3 mt-3">
+                                                    <input type="text" class="form-control" name="otherTipo"
+                                                        id="otherTipo" placeholder="Tipo">
+                                                    <label for="otherTipo">Tipo</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-10">
+                                <button type="button" class="btn btn-primary" id="agregarEquipo-btn"><i
+                                        class="ri-add-line"></i></button>
+                                <button type="button" class="btn btn-secondary" id="cancelar">Limpiar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="{{ url_for('static', path='/js/equipos.js') }}"></script>
+{% endblock %}

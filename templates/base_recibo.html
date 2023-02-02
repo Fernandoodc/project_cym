@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <table style="border-collapse: collapse; width: 100%; height: 190px;" border="1">
+        <tbody>
+            <tr style="height: 21px;">
+                <td style="width: 22.0157%; height: 21px; border-style: hidden; border-width: 1px; ">
+                    <p style="font-family: verdana, geneva, sans-serif; border: 1px; border-radius: 5px; padding: 5px;">
+                        Numero: {{recibo.numeroRecibo}}</p>
+                </td>
+                <td style="width: 56.0765%; text-align: center; height: 21px; border-style: hidden; border-width: 1px;">
+                    <h2><span style="color: #843fa1; font-family: verdana, geneva, sans-serif;"><strong>Recibo de
+                                Dinero</strong></span></h2>
+                </td>
+                <td style="width: 21.9077%; height: 21px; border-style: hidden; text-align: center; border-width: 1px;">
+                    <span
+                        style="font-family: verdana, geneva, sans-serif; border: 1px solid; padding: 5px 15px; border-radius: 5px;">Gs.
+                        {{ '{0:0,.0f}'.format(recibo.monto).replace(",", ".") }}</span></td>
+            </tr>
+            <tr style="height: 35px;">
+                <td style="width: 99.9999%; height: 35px; border-style: hidden; text-align: center; border-width: 1px;"
+                    colspan="3">
+                    <h3><span style="font-family: verdana, geneva, sans-serif;"><strong>C&amp;M
+                                Empredimientos</strong></span></h3>
+                </td>
+            </tr>
+            <tr style="height: 22px;">
+                <td style="width: 22.0157%; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>Recibi (mos) de:</strong></span>
+                    </p>
+                </td>
+                <td style="width: 56.0765%; height: 22px; border-style: hidden; text-align: left; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">{{cliente.nombre}}
+                            {{cliente.apellido}}</span></p>
+                </td>
+                <td style="width: 21.9077%; text-align: center; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>RUC:</strong>
+                        {{cliente.documento}}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 22px;">
+                <td style="width: 22.0157%; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>La Cantidad de
+                                Guaranies:</strong></span></p>
+                </td>
+                <td style="text-align: left; width: 77.9842%; height: 22px; border-style: hidden; border-width: 1px;"
+                    colspan="2">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">{{monto}}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 22px;">
+                <td style="width: 22.0157%; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>En Concepto de:</strong></span>
+                    </p>
+                </td>
+                <td style="text-align: left; width: 77.9842%; height: 22px; border-style: hidden; border-width: 1px;"
+                    colspan="2">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">{{concepto}}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 33px;">
+                <td style="width: 22.0157%; height: 33px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>Lugar / Fecha:</strong></span>
+                    </p>
+                </td>
+                <td style="text-align: left; width: 56.0765%; height: 33px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">Carmen del Parana,
+                            {{recibo.fecha}}</span></p>
+                </td>
+                <td style="text-align: left; width: 21.9077%; height: 33px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>Saldo:</strong> GS.
+                        {{ '{0:0,.0f}'.format(recibo.saldo).replace(",", ".") }}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 35px;">
+                <td style="width: 99.9999%; border-style: hidden; height: 35px; border-width: 1px;" colspan="3">
+                    <p style="text-align: center;">&nbsp;</p>
+                    <p style="text-align: center;"><span style="font-family: verdana, geneva, sans-serif;">Firma
+                            Autorizada: _____________________</span></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <hr style="height: 2px;border-width: 2px; border-style: dashed; border-color: black;" >
+    <table style="border-collapse: collapse; width: 100%; height: 122px;" border="1">
+        <tbody>
+            <tr style="height: 21px;">
+                <td style="width: 22.0157%; height: 21px; border-style: hidden; border-width: 1px;"><span
+                        style="font-family: verdana, geneva, sans-serif;">Numero: {{recibo.numeroRecibo}}</span></td>
+                <td style="width: 56.0765%; text-align: center; height: 21px; border-style: hidden; border-width: 1px;">
+                    <h2><span style="color: #843fa1; font-family: verdana, geneva, sans-serif;"><strong>Recibo de
+                                Dinero</strong></span></h2>
+                </td>
+                <td style="width: 21.9077%; height: 21px; border-style: hidden; text-align: center; border-width: 1px;">
+                    <span style="font-family: verdana, geneva, sans-serif;">Gs. {{ '{0:0,.0f}'.format(recibo.monto).replace(",", ".") }}</span></td>
+            </tr>
+            <tr style="height: 22px;">
+                <td style="width: 22.0157%; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>Recibi (mos) de:</strong></span>
+                    </p>
+                </td>
+                <td style="width: 56.0765%; height: 22px; border-style: hidden; text-align: left; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">{{cliente.nombre}}
+                            {{cliente.apellido}}</span></p>
+                </td>
+                <td style="width: 21.9077%; text-align: center; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>RUC:</strong>
+                            {{cliente.documento}}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 22px;">
+                <td style="width: 22.0157%; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>La Cantida de
+                                Guaranies:</strong></span></p>
+                </td>
+                <td style="text-align: left; width: 77.9842%; height: 22px; border-style: hidden; border-width: 1px;"
+                    colspan="2">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">{{monto}}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 22px;">
+                <td style="width: 22.0157%; height: 22px; border-style: hidden; border-width: 1px;">
+                    <p><span style="font-family: verdana, geneva, sans-serif;"><strong>En Concepto de:</strong></span>
+                    </p>
+                </td>
+                <td style="text-align: left; width: 77.9842%; height: 22px; border-style: hidden; border-width: 1px;"
+                    colspan="2">
+                    <p><span style="font-family: verdana, geneva, sans-serif;">{{concepto}}</span></p>
+                </td>
+            </tr>
+            <tr style="height: 35px;">
+                <td style="border-style: hidden; height: 35px; border-width: 1px; width: 22.0157%;" colspan="2">
+                    <p style="text-align: center;">&nbsp;</p>
+                    <p style="text-align: center;"><span style="font-family: verdana, geneva, sans-serif;">Firma
+                            Autorizada: _____________________</span></p>
+                </td>
+                <td style="border-style: hidden; border-width: 1px; width: 21.9077%; height: 35px;">
+                    <p style="text-align: center;"><span
+                            style="font-family: verdana, geneva, sans-serif;"><strong>Saldo: GS.
+                                {{ '{0:0,.0f}'.format(recibo.saldo).replace(",", ".") }}</strong></span></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

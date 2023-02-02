@@ -4,8 +4,7 @@ from mongo import find_one
 from config import settings
 from models import tokenUser
 from datetime import timedelta
-manager = LoginManager( settings.SECRET_KEY, '/login', use_cookie=True, use_header=False, default_expiry=timedelta(hours=8))
-
+manager = LoginManager( settings.SECRET_KEY, '/login', use_cookie=True, use_header=True, default_expiry=timedelta(hours=8))
 @manager.user_loader()
 def get_user(username: str):
     """
@@ -14,15 +13,13 @@ def get_user(username: str):
     :return: None or the user object
     """
     try:
-       
-        user = find_one('usuarios', {'username': username}, {'_id': 0,'username': 1, 'codTipoUsuario': 1})
+        user = find_one('usuarios', {'username': username}, {'_id': 0,'username': 1, 'codTipoUsuario': 1, 'nombre': 1, 'apellido': 1})
         info = tokenUser(username=user['username'], typeUser=user['codTipoUsuario'])
-        return info
+        return user
     except Exception as e:
         print(e, "error")
         return None
-
-
+    
 def query_user(username: str):
     """
     Get a user from the db

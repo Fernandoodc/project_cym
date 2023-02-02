@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Editar Producto{% endblock %}
+{% block css %}
+<link href="{{url_for('static', path='css/select2.min.css')}}" rel="stylesheet">
+
+<link rel="stylesheet" href="{{url_for('static', path='css/select2-bootstrap-5-theme.min.css')}}" />
+{% endblock %}
+{% block content %}
+    <div class="pagetitle">
+      <h1>Agregar Pedido</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+          <li class="breadcrumb-item">Productos</li>
+          <li class="breadcrumb-item active">Editar Producto</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Nuevo Producto</h5>
+               
+              <!-- General Form Elements -->
+              <form id="aggPedido" method="post">
+                <div class="row mb-3">
+                  <label for="inputText" class="col-sm-2 col-form-label">Descripción<span class="text-danger">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="descripcion" value="{{producto.descripcion}}">
+                  </div>
+                </div>
+                <div class="row mb-3" id="div_insumos">
+                    <label class="col-sm-2 col-form-label">Insumos</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <select class="form-select insumos-select" id="insumo" aria-label="Default select example">
+                                    {% for insumo in insumos %}
+                                        <option value="{{insumo.codInsumo}}">{{insumo.codInsumo}} - {{insumo.descripcion}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-floating mb-3" id="cantidad-div">
+                                    <input
+                                        type="number"
+                                        class="form-control" name="cantidad" id="cantidadInsumo" placeholder="Cantidad">
+                                    <label for="cantidadInsumo">Cantidad</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" id="agregarInsumo" class="btn btn-success"><i class="bi bi-check-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="table-responsive-sm">
+                                <table class="table" id="insumos-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Insumos</th>
+                                            <th scope="col">Cantidad</th>
+                                            <th scope="col">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="insumos-tbody">
+                                        {% for insumo in insumosProducto %}
+                                            {% for dato in insumo.datos %}
+                                                {% if dato.codInsumo == insumo.insumo.codInsumo %}
+                                                    <tr class="{{dato.codInsumo}}-{{dato.cantidad}}">
+                                                        <td>{{insumo.insumo.descripcion}}</td>
+                                                        <td>{{dato.cantidad}}</td> 
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger" onclick="eliminarInsumo('{{dato.codInsumo}}','{{dato.cantidad}}')"><i class="ri-delete-bin-2-line"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputText" class="col-sm-2 col-form-label">Precio Base<span class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <input type="number" min="0" class="form-control" id="precioBase" value="{{producto.precioBase}}">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputText" class="col-sm-2 col-form-label">Metodo Calculo<span class="text-danger">*</span></label>
+                    <div class="col-sm-10">
+                        <select class="form-select" name="" id="metodoCalculo">
+                            <option value="1">Cantidad</option>
+                            <option value="2">Centímetros Cuadrado</option>
+                            <option value="3">Metros Cuadrados</option>
+                        </select>
+                     </div>
+                </div>
+                <div class="row mb-3" id="div_insumos">
+                    <label class="col-sm-2 col-form-label">Precios Mayoristas</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="form-floating mb-3">
+                                  <input
+                                    type="number"
+                                    class="form-control" name="mayoristasDesde" id="mayoristasDesde" placeholder="desde">
+                                  <label for="mayoristasDesde">Desde</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-floating mb-3">
+                                  <input
+                                    type="number"
+                                    class="form-control" name="mayoristasPrecio" id="mayoristasPrecio" placeholder="Gs.">
+                                  <label for="mayoristasPrecio">Gs.</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" id="mayoristasAgregar" class="btn btn-success"><i class="bi bi-check-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="table-responsive-sm">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Desde</th>
+                                            <th scope="col">Gs.</th>
+                                            <th scope="col">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mayoristas-tbody">
+                                        {% for mayorista in producto.preciosMayoristas %}
+                                            <tr>
+                                                <td>
+                                                    {{mayorista.cantidad}}
+                                                </td>
+                                                <td>{{mayorista.precio}}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger" onclick="eliminarMayorista('{{mayorista.cantidad}}', '{{mayorista.precio}}')"><i class="ri-delete-bin-2-line"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <div id="codProducto-div" class="row">
+                </div>
+                <div class="row mb-3">
+                  <div class="col-sm-10">
+                    <button type="button" class="btn btn-primary" id="guardaCambios"><i class="ri-save-3-line"></i></button>
+                    <button type="button" class="btn btn-secondary" id="cancelar">Reiniciar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+        </div>
+
+        </div>
+      </div>
+    </section>
+{% endblock %}
+<!-- Template Main JS File -->
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/errores.js') }}"></script>
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<!-- <script src="{{ url_for('static', path='/js/jquery.slim.min.js') }}"></script> -->
+<script src="{{ url_for('static', path='/js/select2.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="{{ url_for('static', path='/js/productos.js') }}"></script>
+<script>
+  $(document).ready(function() {
+      $('.insumos-select').select2({
+        theme: 'bootstrap-5'
+      });
+  });
+  DATOS = {{producto | tojson}}
+  $('#metodoCalculo option[value="'+DATOS.metodoCalculo.codMetodo+'"]').prop('selected', true)
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Mantenimientos{% endblock %}
+{% block css %}
+  <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
+{% endblock %}
+{% block content %}
+    <div class="pagetitle">
+      <h1>Historial de Mantenimientos</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+          <li class="breadcrumb-item">Equipos</li>
+          <li class="breadcrumb-item active">Mantenimientos</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body"> 
+            <div class="table-responsive-sm mt-3">
+              <table class="table table-hover display" id="listaMantenimientos">
+                <thead>
+                  <tr>
+                    <th>Num. Serie</th>
+                    <th scope="col">Equipo</th>
+                    <th scope="col">Marca</th>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Descripcion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {{mantenimientos}}
+                {% for equipo in equipos %}
+                    {% for mantenimiento in equipo.Mantenimientos %}
+                        <tr>
+                            <td>{{equipo.numSerie}}</td>
+                            <td>{{equipo.tipoEquipo.descripcion}} - {{equipo.modelo}}</td>
+                            <td>{{equipo.marcaEquipo.descripcion}}</td>
+                            <td>{{mantenimiento.fecha}}</td>
+                            <td>{{mantenimiento.mantenimiento.descripcion}}</td>
+                            <td>{{mantenimiento.descripcion}}</td>
+                            
+                        </tr>
+                    {% endfor%}
+                {% endfor%}
+        
+                </tbody>
+              </table>
+              <!-- End Default Table Example -->
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  {% endblock %}
+  {% block scripts %}
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+  <script src="/static/js/dataTables.rowGroup.min.js"></script>
+  <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/equipos.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+        $('#listaMantenimientos').DataTable({
+            language: spanish,
+            order: [[0, 'asc']],
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 2, targets: 0 },
+                { responsivePriority: 10001, targets: 0 },
+                { responsivePriority: 3, targets: -2 }
+            ]
+         });
+    });
+    console.log(spanish)
+    </script>
+{% endblock %}
+</body>
+
+</html>

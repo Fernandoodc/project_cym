@@ -1,5 +1,5 @@
 cont = 0
-function actLista(desc, cant, files, fechaE, del, presu, codDetalle){
+function actLista(desc, cant, files, fechaE, presu, codDetalle){
     formBody = document.getElementById("bodyLista");
     formTr = document.createElement("tr");
     formTh = document.createElement("th");
@@ -7,7 +7,6 @@ function actLista(desc, cant, files, fechaE, del, presu, codDetalle){
     formCant = document.createElement("td")
     formArch = document.createElement("td")
     formFech = document.createElement("td")
-    formDel = document.createElement("td")
     formPresu = document.createElement("td")
     formBtns = document.createElement("td")
 
@@ -22,10 +21,6 @@ function actLista(desc, cant, files, fechaE, del, presu, codDetalle){
     }
     formArch.innerHTML = auxnom + "</p>"
     formFech.innerHTML = fechaE;
-    if (del == true){
-        formDel.innerHTML = '<input class="form-check-input" type="checkbox" id="checkDelivery" checked disabled>';
-    }
-    else formDel.innerHTML = '<input class="form-check-input" type="checkbox" id="checkDelivery" disabled>'
     formPresu.innerHTML = presu;
     btnEdit = document.createElement('button');
     btnEdit.setAttribute("class", "btn btn-primary");
@@ -44,7 +39,6 @@ function actLista(desc, cant, files, fechaE, del, presu, codDetalle){
     formTr.appendChild(formCant);
     formTr.appendChild(formArch);
     formTr.appendChild(formFech);
-    formTr.appendChild(formDel);
     formTr.appendChild(formPresu);
     formTr.appendChild(formBtns);
     formTr.setAttribute('id', codDetalle)

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Baja Insumos{% endblock %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <h1>Agregar Producto</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+        <li class="breadcrumb-item">Productos</li>
+        <li class="breadcrumb-item active">Nuevo Producto</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Datos</h5>
+
+            <!-- General Form Elements -->
+            <form id="aggPedido" method="post">
+              <div class="row mb-3" id="div_insumos">
+                  <label class="col-sm-2 col-form-label">Insumo<span class="text-danger">*</span></label>
+                  <div class="col-sm-10">
+                      <div class="row">
+                          <div class="col-sm-10">
+                              <select class="form-select insumos-select" id="insumo" aria-label="Default select example">
+                                  {% for insumo in insumos %}
+                                      <option value="{{insumo.codInsumo}}">{{insumo.codInsumo}} - {{insumo.descripcion}}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                          <div class="col-sm-2">
+                              <div class="form-floating mb-3" id="cantidad-div">
+                                  <input
+                                      type="number" min="0"
+                                      class="form-control" name="cantidad" id="cantidad" placeholder="Cantidad">
+                                  <label for="cantidad">Cantidad</label>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="row mb-3">
+                <label for="motivo" class="col-form-label col-sm-2">Motivo<span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                    <select class="form-select form-select-lg" name="motivo" id="motivo">
+                        {% for motivo in motivos %}
+                            <option value="{{motivo._id['$oid']}}">{{motivo.descripcion}}</option>
+                        {% endfor %}
+                        <option value="other">Otro</option>
+                    </select>
+                    <div class="row otherMotivo">
+                        <div class="col sm-12">
+                            <div class="form-floating mb-3 mt-3">
+                              <input
+                                type="text"
+                                class="form-control" name="otherMotivo" id="otherMotivo" placeholder="Motivo">
+                              <label for="otherMotivo">Motivo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-10">
+                  <button type="button" class="btn btn-primary" id="baja-btn"><i class="ri-check-fill"></i></button>
+                  <button type="button" class="btn btn-secondary" id="cancelar">Limpiar</button>
+                </div>
+              </div>
+            </form>
+          </div>
+      </div>
+
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="{{ url_for('static', path='/js/insumos.js') }}"></script>
+{% endblock %}

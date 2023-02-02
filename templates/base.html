@@ -10,12 +10,14 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="{{url_for('static', path='/img/favicon.png') }}" rel="icon">
+  <link href="{{url_for('static', path='/img/favicon-16x16.png') }}" rel="icon">
   <link href="{{url_for('static', path='/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <!--<link href="https://fonts.gstatic.com" rel="preconnect">-->
+  <link rel="stylesheet" href="/static/css/google_fonts/css.css">
+  <!--<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">-->
+  
 
   <!-- Vendor CSS Files -->
   <link href="{{url_for('static', path='/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -51,10 +53,6 @@
     </div><!-- End Logo -->
 
     <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="#">
-        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-      </form>
     </div><!-- End Search Bar -->
 
     <nav class="header-nav ms-auto">
@@ -141,72 +139,6 @@
 
         </li><!-- End Notification Nav -->
 
-        <li class="nav-item dropdown">
-
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-chat-left-text"></i>
-            <span class="badge bg-success badge-number">3</span>
-          </a><!-- End Messages Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-            <li class="dropdown-header">
-              You have 3 new messages
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="/static/img/messages-1.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Maria Hudson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>4 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="/static/img/messages-2.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Anna Nelson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>6 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="/static/img/messages-3.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>David Muldon</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>8 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="dropdown-footer">
-              <a href="#">Show all messages</a>
-            </li>
-
-          </ul><!-- End Messages Dropdown Items -->
-
-        </li><!-- End Messages Nav -->
-
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
@@ -216,19 +148,12 @@
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <h6>{{userInfo.nombre}} {{userInfo.apellido}}</h6>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
 
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
             <li>
               <hr class="dropdown-divider">
             </li>
@@ -236,27 +161,20 @@
             <li>
               <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
                 <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
+                <span>Configurar Cuenta</span>
               </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="/logout">
                 <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
+                <span>Cerrar Sesión</span>
               </a>
             </li>
 
@@ -279,6 +197,17 @@
           <span>Inicio</span>
         </a>
       </li><!-- End Dashboard Nav -->
+      
+      <li class="nav-item">
+        <a class="nav-link collapsed active" href="/trabajos/orden_trabajo" id="orden_trabajo">
+          <i class="ri-list-check-2"></i><span>Orden de Trabajo</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/clientes/clientes" class="nav-link collapsed" id="clientes-nav">
+          <i class="ri-parent-fill"></i><span>Lista de Clientes</span>
+        </a>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#pedidos-nav" data-bs-toggle="collapse" href="#">
@@ -296,58 +225,45 @@
             </a>
           </li>
           
-          <li>
-            <a href="/pedidos/presupuestos" id="presupuestos">
-              <i class="bi bi-circle"></i><span>Presupuestos</span>
-            </a>
-          </li>
           
         </ul>
       </li>
-
+      
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#trabajos-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Trabajos</span><i class="bi bi-chevron-down ms-auto"></i>
+        <a class="nav-link collapsed" data-bs-target="#comercio-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-layout-text-window-reverse"></i><span>Comercio</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="trabajos-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <ul id="comercio-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/trabajos/orden_trabajo" id="orden_trabajo">
-              <i class="bi bi-circle"></i><span>Orden de Trabajo</span>
+            <a href="/pagos/cobranza" id="registrar_pago">
+              <i class="bi bi-circle"></i><span>Cobranza</span>
             </a>
           </li>
           <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Data Tables</span>
+            <a href="/productos/productos" id="productos">
+              <i class="bi bi-circle"></i><span>Productos</span>
+            </a>
+          </li>
+          <li>
+            <a href="/productos/nuevo_producto" id="new-producto">
+              <i class="bi bi-circle"></i><span>Nuevo Producto</span>
             </a>
           </li>
         </ul>
       </li><!-- End Tables Nav -->
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#clientes-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Clientes</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="clientes-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="clientes/clientes" class="active" id="clientes">
-              <i class="bi bi-circle"></i><span>Lista de Clientes</span>
-            </a>
-          </li>
-          <li>
-            <a href="/cliente/nuevo_cliente" id="nuevo_cliente">
-              <i class="bi bi-circle"></i><span>Nuevo Cliente</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-      <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#insumos-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-bar-chart"></i><span>Insumos</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="ri-ink-bottle-fill"></i><span>Insumos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="insumos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/insumos/insumos" id="insumos">
+            <a href="/insumos/insumos" id="Listainsumos-nav">
               <i class="bi bi-circle"></i><span>Lista de Insumos</span>
+            </a>
+          </li>
+          <li>
+            <a href="/insumos/baja_insumos" id="BajaInsumo-nav">
+              <i class="bi bi-circle"></i><span>Baja de Insumos</span>
             </a>
           </li>
           <li>
@@ -355,12 +271,19 @@
               <i class="bi bi-circle"></i><span>Registrar compra de Insumos</span>
             </a>
           </li>
+          <li>
+            <a href="/insumos/proveedores">
+              <i class="bi bi-circle"></i><span>Proveedores</span>
+            </a>
+          </li>
         </ul>
       </li><!-- End Charts Nav -->
 
+      {% if userInfo.codTipoUsuario == 1 %}
+
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#equipos-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Equipos</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="ri-printer-fill"></i><span>Equipos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="equipos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -373,104 +296,68 @@
               <i class="bi bi-circle"></i><span>Nuevo Equipo</span>
             </a>
           </li>
+          <li>
+            <a href="/equipos/mantenimientos" id="lista_mantenimientos">
+              <i class="bi bi-circle"></i><span>Mantenimientos</span>
+            </a>
+          </li>
         </ul>
       </li><!-- End Icons Nav -->
-
-      {% if userInfo.typeUser == 1 %}
-
+      <li class="nav-heading">Reportes</li>
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#reportes-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Reportes</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="ri-list-unordered"></i><span>Pedidos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="reportes-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/reportes/insumos_utilizados" id="insumos_utilizados">
-              <i class="bi bi-circle"></i><span>Insumos Utilizados</span>
+            <a href="/reportes/pedidos/resumen" id="sin_entregar">
+              <i class="bi bi-circle"></i><span>Resumen de Pedidos</span>
             </a>
           </li>
           <li>
-            <a href="/reportes/insumos_perdidos" id="insumos_perdidos">
-              <i class="bi bi-circle"></i><span>reporte 2</span>
+            <a href="/reportes/pedidos/sin_entregar" id="insumos_utilizados">
+              <i class="bi bi-circle"></i><span>No entregados</span>
             </a>
           </li>
           <li>
-            <a href="/reportes/sin_entregar" id="sin_entregar">
-              <i class="bi bi-circle"></i><span>reporte 3</span>
+            <a href="/reportes/pedidos/adeudados" id="insumos_perdidos">
+              <i class="bi bi-circle"></i><span>Adeudados</span>
             </a>
           </li>
         </ul>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#usuarios-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Usuarios</span><i class="bi bi-chevron-down ms-auto"></i>
+        <a class="nav-link collapsed" data-bs-target="#Reinsumos-nav" data-bs-toggle="collapse" href="#">
+          <i class="ri-file-paper-2-line"></i><span>Insumos</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="usuarios-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="Reinsumos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/usuario/usuarios" id="usuarios">
-              <i class="bi bi-circle"></i><span>Lista de Usuarios</span>
+            <a href="/reportes/insumos/perdidos_detalles" id="perdidos-detalles">
+              <i class="bi bi-circle"></i><span>Perdidos(detalles)</span>
             </a>
           </li>
           <li>
-            <a href="/usuarios/nuevo_usuario" id="nuevo_usuario">
-              <i class="bi bi-circle"></i><span>Agregar Usuario</span>
+            <a href="/reportes/insumos/perdidos_resumen" id="usuarios">
+              <i class="bi bi-circle"></i><span>Perdidos(Resumen)</span>
+            </a>
+          </li>
+          <li>
+            <a href="/reportes/insumos/utilizados" id="nuevo_usuario">
+              <i class="bi bi-circle"></i><span>Utilizados</span>
             </a>
           </li>
         </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed active" href="/usuarios/"  id="usuarios">
+          <i class="ri-user-3-line"></i><span>Usuarios</span>
+        </a>
       </li>
 
       {%endif%}
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
-          <i class="bi bi-question-circle"></i>
-          <span>F.A.Q</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-card-list"></i>
-          <span>Register</span>
-        </a>
-      </li><!-- End Register Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Login Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-dash-circle"></i>
-          <span>Error 404</span>
-        </a>
-      </li><!-- End Error 404 Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-blank.html">
-          <i class="bi bi-file-earmark"></i>
-          <span>Blank</span>
-        </a>
-      </li><!-- End Blank Page Nav -->
-
+      
     </ul>
 
   </aside><!-- End Sidebar-->

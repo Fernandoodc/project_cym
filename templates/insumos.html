@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Insumos{% endblock %}
+{% block css %}
+  <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+  <link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
+{% endblock %}
 {% block content %}
     <div class="pagetitle">
-      <h1>Lista de Insumo</h1>
+      <h1>Insumos</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Inicio</a></li>
@@ -15,57 +20,11 @@
     <section class="section">
       <div class="row">
         <div class="col-lg-12">
-
           <div class="card">
             <div class="card-body">
-              
+              <h5 class="card-title">Lista de Insumos</h5>
             <div class="table-responsive-sm mt-3">
                 <!-- Default Table -->
-                <div class="modal fade" id="bajaInsumo" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Dar de Baja</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Código del Insumo</label>
-                                    <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="bajaCod" value="00000" disabled>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Descripción</label>
-                                    <div class="col-sm-10">
-                                    <input type="text" id="bajaDesc" class="form-control" value="0000 - Sublimación Taza" disabled>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                  <label for="inputText" class="col-sm-2 col-form-label">Motivo</label>
-                                  <div class="col-sm-10">
-                                    <select class="form-select form-select-lg" name="motiv" id="bajaMot">
-                                      <option selected>Producto Vencido</option>
-                                      <option value="">Descompuesto</option>
-                                      <option value="">Otro</option>
-                                    </select>
-                                  </div>
-                              </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Cantidad</label>
-                                    <div class="col-sm-10">
-                                        <input type="number" min="1" max="5" name="" id="bajaCant">
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                <button class="btn btn-danger" id="btnProduccion">Dar de Baja</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
               <table class="table table-hover display" id="listaInsumos">
                 <thead>
                   <tr>
@@ -73,7 +32,7 @@
                     <th scope="col">Insumo</th>
                     <th>Stock Actual.</th>
                     <th scope="col">Stock Mínimo</th>
-                    <th>Acciones</th>
+                    <th>Tipo</th>
                     <!--<th>Acciones</th>-->
                   </tr>
                 </thead>
@@ -81,13 +40,18 @@
                 {% for insumo in insumos %}
                 
                   <tr id="" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">
-                    
                     <td>{{insumo.codInsumo}}</td>
                     <td>{{insumo.descripcion}}</td>
-                    <td>{{insumo.stock}}</td>
+                    <td>
+                      {% if insumo.stock %}
+                        {{insumo.stock}}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
                     <td>{{insumo.stockMin}}</td>
-                    <td><button type="button" class="btn btn-danger" onclick="baja('{{insumo.codInsumo}}')" data-bs-toggle="modal" data-bs-target="#bajaInsumo">Dar de Baja</button></td>
-                   
+                    <td>{{insumo.tipoInsumo.descripcion}}</td>
+
                   </tr>
                 
                 {% endfor%}
@@ -103,26 +67,18 @@
     </section>
 
   {% endblock %}
-  
+  {% block scripts %}
   <!-- Template Main JS File -->
   <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
   <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
   <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/axios.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
   <script>
     $(document).ready(function () {
         $('#listaInsumos').DataTable({
         language: spanish,
-        dom: 'Bfrtip',
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ]
          });
     });
     console.log(spanish)
     </script>
-
-</body>
-
-</html>
+{% endblock %}

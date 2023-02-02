@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock %}
+{% block css %}
+  <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
+{% endblock %}
+{% block content %}
+    <div class="pagetitle">
+      <h1>Lista de Equipos</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+          <li class="breadcrumb-item active">Equipos</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body"> 
+              <div class="modal fade" id="eliminarEquipo-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="eliminarEquipo-title" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+                      <div class="modal-content">
+                          <div class="modal-body">
+                              <p>¿Seguro que desea eliminar el Equipo</p>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-danger" id="eliminarEquipo-btn">Eliminar</button>
+                              <button type="button" class="btn btn-primary"  data-bs-dismiss="modal">Cancelar</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              
+              <!-- Modal Body -->
+              <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
+              <div class="modal fade" id="infoEquipo-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="infoEquipo-title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="infoEquipo-title">Información de Equipo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <label for="numSerie" class="col-form-label col-sm-2">Numero de Serie</label>
+                                <div class="col-sm-10">
+                                    <input type="text"
+                                        class="form-control" name="numSerie" id="numSerie" aria-describedby="helpId" placeholder="" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="numSerie" class="col-form-label col-sm-2">Marca</label>
+                                <div class="col-sm-4">
+                                    <input type="text"
+                                        class="form-control" name="marca" id="marca" aria-describedby="helpId" placeholder="" disabled>
+                                </div>
+                                <label for="numSerie" class="col-form-label col-sm-2">Modelo</label>
+                                <div class="col-sm-4">
+                                    <input type="text"
+                                        class="form-control" name="modelo" id="modelo" aria-describedby="helpId" placeholder="" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="numSerie" class="col-form-label col-sm-2">Tipo</label>
+                                <div class="col-sm-4">
+                                    <input type="text"
+                                        class="form-control" name="tipo" id="tipo" aria-describedby="helpId" placeholder="" disabled>
+                                </div>
+                                <label for="numSerie" class="col-form-label col-sm-2">Fecha de Adquisición</label>
+                                <div class="col-sm-4">
+                                    <input type="date"
+                                        class="form-control" name="fechaAdqui" id="fechaAdqui" aria-describedby="helpId" placeholder="" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="mantenimientos-btn">Mantenimientos</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>   
+                        </div>
+                    </div>
+                </div>
+              </div>
+            <div class="table-responsive-sm mt-3">
+              <table class="table table-hover display" id="listaEquipos">
+                <thead>
+                  <tr>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Marca</th>
+                    <th>Modelo</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for equipo in equipos %}
+                  <tr>
+                    <td onclick="infoEquipo('{{equipo._id['$oid']}}')" >{{equipo.tipoEquipo.descripcion}}</td>
+                    <td onclick="infoEquipo('{{equipo._id['$oid']}}')">{{equipo.marcaEquipo.descripcion}}</td>
+                    <td onclick="infoEquipo('{{equipo._id['$oid']}}')">{{equipo.modelo}}</td>
+                    <td>
+                      <button type="button" class="btn btn-primary" onclick="infoEquipo('{{equipo._id['$oid']}}')">
+                        info
+                      </button> 
+                      <a class="btn btn-success" href="/equipos/agregar_matenimiento/{{equipo._id['$oid']}}" role="button">
+                        Agregar Mantenimiento
+                      </a> 
+                      <button type="button" class="btn btn-danger" onclick="eliminarEquipo('{{equipo._id['$oid']}}')">
+                        Eliminar
+                      </button>
+                  </td>
+                  </tr>
+
+                {% endfor%}
+        
+                </tbody>
+              </table>
+              <!-- End Default Table Example -->
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  {% endblock %}
+  {% block scripts %}
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+  <script src="/static/js/dataTables.rowGroup.min.js"></script>
+  <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/equipos.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+        $('#listaEquipos').DataTable({
+            language: spanish,
+            order: [[0, 'asc']],
+            rowGroup: {
+                dataSrc: 0
+            }
+         });
+    });
+    console.log(spanish)
+    </script>
+{% endblock %}
+</body>
+
+</html>

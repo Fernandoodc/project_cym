@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block css %}
+<link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
+{% endblock %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Usuarios</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item active">Usuarios</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Lista de Usuarios</h5>
+                    <a name="" id="" class="btn btn-primary" href="/usuarios/nuevo_usuario" role="button">Agregar
+                        Usuarios</a>
+                    <div class="table-responsive-sm mt-3">
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="infoUser-modal" tabindex="-1" role="dialog"
+                            aria-labelledby="infoUser-title" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="infoUser-title">Información de Usuarios</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Nav tabs -->
+                                        <ul class="nav nav-tabs" id="user-tabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="infoUser-tab" data-bs-toggle="tab"
+                                                    data-bs-target="#infoUser" type="button" role="tab"
+                                                    aria-controls="infoUser" aria-selected="true">Datos</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation" id="changePasw-nav">
+                                                <button class="nav-link" id="changePasw-tab" data-bs-toggle="tab"
+                                                    data-bs-target="#changePasw" type="button" role="tab"
+                                                    aria-controls="changePasw" aria-selected="false">Acceso</button>
+                                            </li>
+                                        </ul>
+
+                                        <!-- Tab panes -->
+                                        <div class="tab-content">
+                                            <div class="tab-pane active" id="infoUser" role="tabpanel"
+                                                aria-labelledby="infoUser-tab">
+                                                <div class="container-fluid">
+                                                    <div class="mb-3 mt-3 row">
+                                                        <label for="newUsername" class="col-form-label col-sm-2">Nombre de
+                                                            Usuario<span class="text-danger obli " >*</span></label>
+                                                        <div class="col-sm-4">
+                                                            <div class="input-group has-validation">
+                                                                <span class="input-group-text" id="inputGroupPrepend">@</span>
+                                                                <input type="text" class="form-control infoUser" name="newUsername"
+                                                                    id="newUsername" aria-describedby="alertUsername">
+                                                                <small id="alertUsername" class="form-text text-danger">El nombre de usuario ya se encuentra en uso</small>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        
+                                                        <label for="documentos" class="col-form-label col-sm-2">Documento<span class="text-danger obli " >*</span></label>
+                                                        <div class="col-sm-4">
+                                                            <input type="text" class="form-control infoUser" name="documento"
+                                                                id="documento" aria-describedby=""
+                                                                placeholder="documento">
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3 row">
+                                                        <label for="nombre"
+                                                            class="col-form-label col-sm-2">Nombre<span class="text-danger obli " >*</span></label>
+                                                        <div class="col-sm-4">
+                                                            <input type="text" class="form-control infoUser" name="nombre"
+                                                                id="nombre" aria-describedby="" placeholder="nombre">
+                                                        </div>
+                                                        <label for="apellido"
+                                                            class="col-form-label col-sm-2">Apellido<span class="text-danger obli " >*</span></label>
+                                                        <div class="col-sm-4">
+                                                            <input type="text" class="form-control infoUser" name="apellido"
+                                                                id="apellido" aria-describedby="" placeholder="apellido">
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3 row">
+                                                        <label for="celular"
+                                                            class="col-form-label col-sm-2">Celular</label>
+                                                        <div class="col-sm-4">
+                                                            <input type="text" class="form-control infoUser" name="celular"
+                                                                id="celular" aria-describedby="" placeholder="celular">
+                                                        </div>
+                                                        <label for="nacionalidad"
+                                                            class="col-form-label col-sm-2">Nacionalidad<span class="text-danger obli " >*</span></label>
+                                                        <div class="col-sm-4">
+                                                                <select class="form-select form-select-sm infoUser" name="nacionalidad" id="nacionalidad">
+                                                                    {% for nacionalidad in nacionalidades %}
+                                                                        <option value="{{nacionalidad._id}}">{{nacionalidad.descripcion}}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <label for="email" class="col-form-label col-sm-2">Email</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="email" class="form-control infoUser" name="email" id="email">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <label for="direccion" class="col-form-label col-sm-2">Dirección</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control infoUser" name="direccion" id="direccion">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-sm-2">
+                                                            <button type="button" id="guardarCambios-btn" class="btn btn-success" >Guardar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane" id="changePasw" role="tabpanel" aria-labelledby="changePasw-tab"> 
+                                                <div class="container-fluid">
+                                                    <div class="row mb-3 mt-3">
+                                                        <label for="typeUser" class="col-form-label col-sm-3">Tipo de Usuario</label>
+                                                        <div class="col-sm-4">
+                                                                <select class="form-select form-select-sm" name="typeUser" id="typeUser">
+                                                                    {% for tipo in tiposUsuarios %}
+                                                                        <option value="{{tipo.codTipo}}">{{tipo.descripcion}}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col sm-3">
+                                                            <button type="button" class="btn btn-success" id="guardarTypeUser-btn" >Guardar <i class="ri-check-double-line" id="newType-ok"></i> </button>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row mb-3">
+                                                        <h5 class="modal-title">Cambiar Contraseña</h5>
+                                                    </div>
+                                                    <div class="row mt-3 mb-3">
+                                                        <label for="newPasw" class="col-form-label col-sm-3">Contraseña Nueva</label>
+                                                        <div class="col-sm-4">
+                                                            <div class="mb-3">
+                                                                <input type="password"
+                                                                class="form-control newPasw" name="newPasw" id="newPasw" placeholder="" autocomplete="new-password">
+                                                                <small class="text-danger" id="alertPaswLen">Se requieren al menos 6 caracteres</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <label for="reNewPasw" class="col-form-label col-sm-3">Ingrese de Nuevo</label>
+                                                        <div class="col-sm-4">
+                                                            <div class="mb-3">
+                                                                <input type="password"
+                                                                class="form-control newPasw" name="reNewPasw" id="reNewPasw" placeholder="">
+                                                                <small class="text-danger" id="alertnewPasw">Las contraseñas no coinciden</small>  
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-sm-3">
+                                                            <button type="button" class="btn btn-success" id="changePasw-btn">Continuar <i class="ri-check-double-line" id="newPasw-ok"></i></button>  
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cerrar</button>
+                                        <button type="button"  id="editar-btn" class="btn btn-primary">Editar</button>
+                                        <button type="button" id="eliminarUser" class="btn btn-danger">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="eliminarUser-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="eliminarEquipo-title" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <p>¿Seguro que desea eliminar el Equipo</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" id="eliminar-btn">Eliminar</button>
+                                        <button type="button" class="btn btn-primary"  data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Default Table -->
+                        <table class="table table-hover display" id="listaUsuarios">
+                            <thead>
+                                <tr>
+                                    <th>Nombre de Usuario</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Documento</th>
+                                    <th>Tipo de Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr id="{{usuario._id['$oid']}}">
+                                    <td onclick="infoUser('{{usuario._id['$oid']}}')">{{usuario.username}}</td>
+                                    <td onclick="infoUser('{{usuario._id['$oid']}}')">{{usuario.nombre}}</td>
+                                    <td onclick="infoUser('{{usuario._id['$oid']}}')">{{usuario.apellido}}</td>
+                                    <td onclick="infoUser('{{usuario._id['$oid']}}')">{{usuario.documento}}</td>
+                                    <td onclick="infoUser('{{usuario._id['$oid']}}')">
+                                        {{usuario.tipoUsuario.descripcion}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <!-- End Default Table Example -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<!-- Template Main JS File -->
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="/static/js/Responsive-2.4.0/js/dataTables.responsive.min.js"></script>
+<script src="/static/js/password.js"></script>
+<script src="/static/js/usuarios.js"></script>
+
+<script>
+    $(document).ready(function () {
+        toDataUrl('/static/img/logo.png', function (myBase64) {
+            logo = myBase64 // myBase64 is the base64 string
+        });
+        // DataTable initialisation
+        $("#listaUsuarios").DataTable({
+            responsive: true,
+            dom: 'frtilp',
+            paging: true,
+            language: spanish,
+            autoWidth: true,
+        });
+    });
+</script>
+{% endblock %}

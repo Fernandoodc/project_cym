@@ -2,7 +2,9 @@ from pymongo import MongoClient, ReturnDocument, errors
 from pydantic import BaseModel
 client = MongoClient("localhost")
 db = client['cym']
-
+#return None si no encuentra nada
+#return true si encuentra algo
+#return false si ocurre algun error
 def filter(coleccion, condicion = {}):
     try:
         data = db[coleccion].find_one(condicion)

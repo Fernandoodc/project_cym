@@ -9,12 +9,12 @@ from pymongo import MongoClient, errors, ReturnDocument
 import datetime
 import json
 from manager import	 manager
-from mongo import delete_one, delete_many, find_one, find
+from mongo import delete_one, delete_many, find_one, find, update_one
+from functions import infoPedidos, trabajos
 
 client = MongoClient("localhost")
 db = client['cym']
 Pedidos = APIRouter()
-
 
 templates = Jinja2Templates(directory="templates")
 
@@ -31,7 +31,14 @@ def actPresuPedido(pedido: models.actPresu):
 
 @Pedidos.get("/pedidos")
 async def pedidos(request: Request, user=Depends(manager)):
-    return templates.TemplateResponse("pedidos.html", context={"request": request})
+    pedidos = infoPedidos.infoFullAllPedidos()
+    
+    return templates.TemplateResponse("pedidos.html", context={"request": request, 'pedidos': pedidos,  'userInfo': user})
+
+@Pedidos.get('/')
+async def listaPedidos(response: Response):
+    pedidos = json_util._json_convert(infoPedidos.infoFullAllPedidos())
+    return pedidos
 
 @Pedidos.get('/nuevo_pedido')
 async def nuevo_pedido(request: Request, user=Depends(manager)):
@@ -43,22 +50,25 @@ async def nuevo_pedido(request: Request, user=Depends(manager)):
 @Pedidos.post('/create_pedido', status_code=status.HTTP_201_CREATED)
 async def createPedido(pedido: models.basePedido, response: Response, user=Depends(manager)):
     date = datetime.datetime.now().strftime("%y%m")
-    try:
-        seq = db['seqPedidos'].find_one_and_update({"date": date}, {"$inc":{"seq": 1}}, upsert = True, return_document=ReturnDocument.AFTER)
-    except Exception as e:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return {'msg': e}
-    codPedido = "PE"+str(date)+str(seq['seq'])
+    seq = db['seqPedidos'].find_one_and_update({"date": date}, {"$inc":{"seq": 1}}, upsert = True, return_document=ReturnDocument.AFTER)
+    delivery = 0
+    if (pedido.delivery.solicitado == True):
+        delivery = db['configuraciones'].find_one()['delivery']['costoDelivery']
+    codPedido = str(date)+str(seq['seq'])
     data = {
         "codPedido": codPedido,
         "fecha": pedido.fecha,
-        "cliente_id": ObjectId(pedido.cliente_id)
+        "cliente_id": ObjectId(pedido.cliente_id),
+        'infoDelivery': {
+            'solicitado': pedido.delivery.solicitado,
+            'costoDelivery': delivery,
+            'direccion': pedido.delivery.direccion
+        },
+        "presupuesto": delivery
     }
-    try:
-        db['pedidos'].insert_one(data)
-    except Exception as e:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return {'msg': e}
+    db['pedidos'].insert_one(data)
+    db['cuentas'].insert_one({"cliente_id": ObjectId(pedido.cliente_id), "codPedido": codPedido, 'saldo': delivery, 'total': delivery})
+    db['clientes'].update_one({'_id': ObjectId(pedido.cliente_id)}, {"$inc": {'saldo': delivery}}, upsert=True)
     return {'msg' : "success",
     "codPedido": codPedido
     }
@@ -71,11 +81,7 @@ async def aggDetPedido(response: Response, detalle:models.detPedido, user=Depend
     predMayo = prod['preciosMayoristas']
     mayorista = False
     precioBase = prod['precioBase']
-    delivery = 0
     descuento = 0
-    #print(predMayo)
-    if detalle.delivery.solicitado == True:
-        delivery = db['delivery'].find_one()['precioDelivery']
     for i in range(0, len(predMayo)):
         for j in range(0, len(predMayo)-1):
             if predMayo[j]['cantidad']>predMayo[j+1]['cantidad']:
@@ -84,23 +90,23 @@ async def aggDetPedido(response: Response, detalle:models.detPedido, user=Depend
                 predMayo[j+1] = aux
     
     for x in predMayo:
-        if detalle.cantidad > x['cantidad'] :
+        if detalle.cantidad >= x['cantidad'] :
             mayorista = True
             pMayorista = x['precio']
     
     if metCal==1:
-        subTotal = (detalle.cantidad * precioBase) + delivery
+        subTotal = (detalle.cantidad * precioBase) #+ delivery
         total = subTotal
         if(mayorista==True):
-          total = (detalle.cantidad * pMayorista) + delivery
-          descuento = subTotal-total
-
+            total = (detalle.cantidad * pMayorista) #+ delivery
+            descuento = subTotal-total
     elif metCal==2 or metCal==3:
         dm2 = detalle.medidas.ancho * detalle.medidas.alto
-        subTotal = (dm2 * precioBase * detalle.cantidad) + delivery
+        precioBase = dm2 * precioBase
+        subTotal = (precioBase * detalle.cantidad) #+ delivery
         total = subTotal
         if mayorista == True:
-            total = (dm2 * pMayorista * detalle.cantidad) + delivery
+            total = (dm2 * pMayorista * detalle.cantidad) #+ delivery
             descuento = subTotal-total
     #rutas de archivos se van a agregar desde upload
     seq = db['seqDet'].find_one_and_update({"codPedido": detalle.codPedido}, {"$inc":{"seq": 1}}, upsert = True, return_document=ReturnDocument.AFTER)
@@ -122,22 +128,28 @@ async def aggDetPedido(response: Response, detalle:models.detPedido, user=Depend
         },
         'entrega': {
             'entregado': False
-        },
-        'inforDelivery': {
-            'solicitado': detalle.delivery.solicitado,
-            'costoDelivery': delivery,
-            'direccion': detalle.delivery.direccion
-        }
+        }#,
+        #'inforDelivery': {
+         #   'solicitado': detalle.delivery.solicitado,
+          #  'costoDelivery': delivery,
+           # 'direccion': detalle.delivery.direccion
+        #}
     }
     db['detallesPedidos'].insert_one(json_util._json_convert(datos))
+    idCliente = json_util._json_convert(db['pedidos'].find_one({'codPedido': detalle.codPedido}))['cliente_id']['$oid']
+    print(idCliente)
+    db['clientes'].update_one({'_id': ObjectId(idCliente)}, {"$inc": {'saldo': total}})
+    db['cuentas'].find_one_and_update({"codPedido": detalle.codPedido, "cliente_id": ObjectId(idCliente)}, {"$inc":{"total": total, "saldo": total}}, upsert = True)
     actPresu = models.actPresu(codPedido=detalle.codPedido, subTotal=subTotal, descuento=descuento, total=total, presupuesto=total)
     actPresuPedido(pedido=actPresu)
 
     montoSena = find_one('configuraciones')
     totalActual = find_one('pedidos', {'codPedido': detalle.codPedido})
     #print(totalActual['presupuesto'])
+    #inserta o no a produccion dependiendo si alcanza o no el monto minimo requerido para seña
+    senaRequired = False
     if totalActual['presupuesto'] < montoSena['senas']['monto']:
-        db['produccion'].insert_one({
+        """db['produccion'].insert_one({
             "codProduccion": codDetalle,
             "detallesPedidos_id": ObjectId(find_one('detallesPedidos', {'codDetalle': codDetalle})['_id']),
             "cantidadRestante": detalle.cantidad,
@@ -145,26 +157,36 @@ async def aggDetPedido(response: Response, detalle:models.detPedido, user=Depend
                 'codEtapa': 0,
                 'descripcion': "No Iniciado"
             }
-        })
+        })"""
+        trabajos.pasarAProduccion(codDetalle)
+        
     else:
-        detalles = find('detallesPedidos', {'codPedido': detalle.codPedido})
+        """detalles = find('detallesPedidos', {'codPedido': detalle.codPedido})
         for i in detalles:
             if find_one('produccion', {'detallesPedidos_id': ObjectId(i['_id'])}) == None:
                 break
-            await delete_one('produccion', {'detallesPedidos_id': ObjectId(i['_id'])})
-
-    return {'msg': 'success', 'codDetalle': codDetalle, 'presupuesto': total}
+            await delete_one('produccion', {'detallesPedidos_id': ObjectId(i['_id'])})"""
+        await trabajos.deleteAllOfProduccion(detalle.codPedido)
+        senaRequired = True
+    presupuestoTotal = db['pedidos'].find_one({'codPedido': detalle.codPedido})['presupuesto']
+    return {'msg': 'success', 'codDetalle': codDetalle, 'presupuesto': total, 'total': presupuestoTotal , 'SenaRequerida': senaRequired}
 
 @Pedidos.delete("/eliminar_det")
 async def eliminarDet(codDetalle : str):
     db['detallesPedidos'].delete_one({'codDetalle': codDetalle})
+    codPedido = db['detallesPedidos'].find_one({'codDetalle': codDetalle})['codPedido']
+    infoPedidos.actPresupuesto(codPedido)
     return 'success'
 
 @Pedidos.delete("/eliminar_pedido", status_code=status.HTTP_200_OK)
-async def eliminarPEdido(resonse: Response, codPedido: str, user=Depends(manager)):
-    print('----------------------\n----------------------\n----------------------\n----------------------\n----------------------\n')
+async def eliminarPedido(resonse: Response, codPedido: str, user=Depends(manager)):
     try:
+        info = json_util._json_convert(db['pedidos'].find_one({'codPedido': codPedido}))
+        db['clientes'].update_one({'_id': ObjectId(info['cliente_id']['$oid'])}, {"$inc": {'saldo': -info['presupuesto']}})
+        """if info['infoDelivery']['solicitado'] == True:
+            db['clientes'].update_one({'_id': ObjectId(info['cliente_id']['$oid'])}, {"$inc": {'saldo': -info['infoDelivery']['costoDelivery']}})"""
         await delete_one('pedidos', {'codPedido': codPedido })
+        await delete_one('cuentas', {'codPedido': codPedido })
         await delete_many('detallesPedidos', {'codPedido': codPedido})
         return 'success'
     except Exception as e:
@@ -172,3 +194,148 @@ async def eliminarPEdido(resonse: Response, codPedido: str, user=Depends(manager
         resonse.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return status.HTTP_500_INTERNAL_SERVER_ERROR
     
+@Pedidos.get('/resumen/{cod}')
+async def resumenPedido(request: Request, cod: str, user=Depends(manager)):
+    pedido = infoPedidos.infoDetalle(cod)
+    delivery = infoPedidos.infoPedido(cod)['infoDelivery']
+    cliente = infoPedidos.infoCliente(cod)
+    return templates.TemplateResponse('base_res_pedido.html', context={'request': request, 'cliente': cliente , 'pedido': pedido, 'delivery': delivery})
+
+
+@Pedidos.get('/info_detalle')
+async def infoDetallePedido(response: Response, codDetalle:str, user=Depends(manager)):
+    detalle = infoPedidos.infoOneDetalle(codDetalle)
+    return json_util._json_convert(detalle)
+
+@Pedidos.post('/editar_detalle')
+async def editarDetalle(response: Response, datos:models.editarDet, user=Depends(manager)):
+    _id = db['detallesPedidos'].find_one({'codDetalle': datos.codDetalle})['_id']
+    produccion = db['produccion'].find_one({'detallesPedidos_id': _id})
+    print(produccion)
+    if(produccion != None and produccion['etapa']['codEtapa'] != 0):
+        response.status_code = status.HTTP_409_CONFLICT
+        return {'msg': 'Producción iniciado, no se puede editar el pedido'}
+    anterior = db['detallesPedidos'].find_one({'codDetalle': datos.codDetalle, 'codPedido': datos.codPedido})
+    if anterior == None:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return None
+    actual = json.loads(datos.json())
+    datosAuditoria = {
+        'codDetalle': datos.codDetalle,
+        'fecha': datetime.datetime.now().strftime("%y-%m-%d %H:%M"),
+        'usuario': user.username,
+        'accion': 'editar',
+        'anterior': anterior,
+        'cambios': actual
+    }
+    db['auditoriaDetallesPedidos'].insert_one(datosAuditoria)
+
+    prod = db['productos'].find_one({'codProducto': anterior['detalleProducto']['codProducto']})
+    metCal = prod['metodoCalculo']['codMetodo']
+    predMayo = prod['preciosMayoristas']
+    mayorista = False
+    precioBase = prod['precioBase']
+    descuento = 0
+    for i in range(0, len(predMayo)):
+        for j in range(0, len(predMayo)-1):
+            if predMayo[j]['cantidad']>predMayo[j+1]['cantidad']:
+                aux = predMayo[j]
+                predMayo[j] = predMayo[j+1]
+                predMayo[j+1] = aux
+    
+    for x in predMayo:
+        if datos.cantidad > x['cantidad'] :
+            mayorista = True
+            pMayorista = x['precio']
+    
+    if metCal==1:
+        subTotal = (datos.cantidad * precioBase) #+ delivery
+        total = subTotal
+        if(mayorista==True):
+            total = (datos.cantidad * pMayorista) #+ delivery
+            descuento = subTotal-total
+    elif metCal==2 or metCal==3:
+        dm2 = datos.medidas.ancho * datos.medidas.alto
+        precioBase = dm2 * precioBase
+        subTotal = (precioBase * datos.cantidad) #+ delivery
+        total = subTotal
+        if mayorista == True:
+            total = (dm2 * pMayorista * datos.cantidad) #+ delivery
+            descuento = subTotal-total
+
+    presupuesto = {
+        'subTotal': subTotal,
+        'descuento': descuento,
+        'presupuesto': total
+    }
+    
+    db['detallesPedidos'].update_one({'codDetalle': datos.codDetalle, 'codPedido': datos.codPedido}, {'$set': json.loads(datos.json())})
+    if anterior['presupuesto'] != presupuesto['presupuesto'] or anterior['descuento'] != presupuesto['descuento'] or anterior['subTotal'] != presupuesto['subTotal']:
+        db['detallesPedidos'].update_one({'codDetalle': datos.codDetalle, 'codPedido': datos.codPedido}, {'$set': presupuesto })
+        infoPedidos.actPresupuesto(datos.codPedido)
+    return json_util._json_convert(presupuesto)
+
+@Pedidos.post('/actualizar_info')
+async def actualizarDelivery(response: Response, codPedido: str ,datos: models.actInfoPedido, user=Depends(manager)):
+    
+    if (datos.delivery.direccion == '' and datos.delivery.solicitado == True):
+        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        return 0
+    anterior = db['pedidos'].find_one({'codPedido': codPedido})
+    if anterior == None:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return None
+    actual = json.loads(datos.json())
+    infoDelivery = anterior['infoDelivery']
+    infoFechaEntrega = db['detallesPedidos'].find_one({'codPedido': codPedido})
+    infoFechaEntrega = infoFechaEntrega['fechaEntrega']
+    actual['delivery']['costoDelivery'] =  infoDelivery['costoDelivery']
+    anterior['fechaEntrega'] = infoFechaEntrega
+    if infoDelivery['costoDelivery'] <= 0 and datos.delivery.solicitado == True:
+        costoDelivery = db['configuraciones'].find_one()['delivery']['costoDelivery']
+        actual['delivery']['costoDelivery'] = costoDelivery
+    datosAuditoria = {
+        'codPedido': codPedido,
+        'fecha': datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        'usuario': user.username,
+        'accion': 'editar',
+        'anterior': anterior,
+        'cambios': actual
+    }
+    db['auditoriaPedidos'].insert_one(datosAuditoria)
+    if datos.delivery.solicitado != infoDelivery['solicitado']:
+        db['pedidos'].update_one({'codPedido': codPedido}, {'$set':{'infoDelivery':actual['delivery']}})
+        infoPedidos.actPresupuesto(codPedido)
+    if datos.fechaEntrega != infoFechaEntrega:
+        db['detallesPedidos'].update_many({'codPedido': codPedido}, {'$set': {'fechaEntrega': datos.fechaEntrega}})
+    return {'msg': 'success'}
+
+@Pedidos.post('/entregar_detalle')
+async def entregarDetalle(response: Response, datos: models.entregarDetalle, user=Depends(manager)):
+    _id = db['detallesPedidos'].find_one({'codDetalle': datos.codDetalle})
+    _id = _id['_id']
+    estado = db['produccion'].find_one({'detallesPedidos_id': _id})['etapa']
+    if estado['codEtapa'] == 2:
+        entrega = {
+            'fechaEntrega': datos.fechaEntrega,
+            'entregado': datos.entregado
+        }
+        db['detallesPedidos'].update_one({'codDetalle': datos.codDetalle}, {'$set': {'entrega': entrega}})
+        return {'msg': 'success'}
+    response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    return {'msg': 'Producción sin terminar, no se puede entregar'}
+
+@Pedidos.post('/entregar_pedido')
+async def entregarDetalle(response: Response, datos: models.entregarPedido, user=Depends(manager)):
+    estado = trabajos.estadoProduccionPedido(datos.codPedido)
+    if estado['produccionTerminada'] == True:
+        entrega = {
+            'fechaEntrega': datos.fechaEntrega,
+            'entregado': datos.entregado
+        }
+        db['detallesPedidos'].update_many({'codPedido': datos.codPedido}, {'$set': {'entrega': entrega}})
+        return {'msg': 'success'}
+    response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    return {'msg': 'Producción sin terminar, no se puede entregar'}
+
+

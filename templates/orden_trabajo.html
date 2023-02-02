@@ -478,19 +478,25 @@
 
           <div class="card">
             <div class="card-body">
-              
+              {% if msg %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  {{msg}}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
             <div class="table-responsive-sm mt-3">
                 <!-- Default Table -->
                 <div class="modal fade" id="detalleTrabajo" tabindex="-1">
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Informacion del pedido</h5>
+                                <h5 class="modal-title">Información</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
+                            <div id="alertProduccion" class="alert"></div>
                             <div class="modal-body">
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Codigo de PRo</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">Código</label>
                                     <div class="col-sm-10">
                                     <input type="text" class="form-control" id="infoCod" value="PE22111-1" disabled>
                                     </div>
@@ -508,7 +514,7 @@
                                     </div>
                                 </div>
                                 <div id="dimensiones" class="row mb-3">
-                                  <label class="col-sm-2 col-form-label">Dimensiones cm2</label>
+                                  <label class="col-sm-2 col-form-label">Dimensiones</label>
                                   <div class="col-sm-5">
                                     <label for="inputText" class="col-sm-3 col-form-label">Ancho</label>
                                     <input type="number" class="form-control" id="ancho" disabled>
@@ -553,7 +559,8 @@
                                                 <tbody id="infoDisenios">
                                                     <tr class="">
                                                         <td scope="row"><a href=""></a></td>
-                                                        <td><button type="button" class="btn btn-primary">Descargar</button></td>
+                                                        <td><button type="button" class="btn btn-primary"><i class="bi download"></i></a></button></td>
+                                                        
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -564,7 +571,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-3" id="aprovado-div" >
                                   <label for="inputText" class="col-sm-2 col-form-label">Diseño Aprovado</label>
                                   <div class="col-sm-10">
                                     <input type="checkbox" value="true" id="checkAprovado" class="form-check-input">
@@ -601,8 +608,8 @@
                 <tbody>
                 {% for trabajo in trabajos %}
                 
-                  <tr id="" onclick="info('{{trabajo.detallePedido_id}}')" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">
-                   
+                  <tr id="" onclick="info('{{trabajo.codProduccion}}')">
+                  
                     <td>{{trabajo.codProduccion}}</td>
                     <td>{{trabajo.producto}}</td>
                     <!--<td>  <input class="form-control border-0 bg-transparent w-auto m-0" type="datetime-local" value="{{trabajo.fechaEntrega}}" disabled>
@@ -658,8 +665,13 @@
   <script src="{{ url_for('static', path='/js/main.js') }}"></script>
   <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
   <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/axios.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/produccion.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/trabajos.js') }}"></script>
+  {% if codProduccion != '' %}
+    <script>
+      info('{{codProduccion}}')
+    </script>
+  {%endif%}
   <script>
     $(document).ready(function () {
         $('#ordenTrabajo').DataTable({
@@ -669,9 +681,8 @@
         buttons: [
             'copy', 'csv', 'excel', 'pdf', 'print'
         ]*/
-         });
+        });
     });
-    console.log(spanish)
     </script>
 
 </body>

@@ -1,105 +1,100 @@
-
-async function info(codProd){
-    $("#infoCod").val('');
-    $("#infoTipo").val('');
-    $("#infoDescripcion").val('');
-    $("#infoArchivos").html('');
-    $("#infoDisenios").html('');
-    $("#infoCant").val('0 de 0')
-    data = await infoProduccion(codProd);
+$('#guardarTerminados').click(async function(){
+    if($('#terminado').val()<=0){
+        $('#terminado').focus();
+        return 0;
+    }
+    data = {
+        codProduccion: codProduccion,
+        cantidad: $('#terminado').val()
+    }
     console.log(data)
-    data = data[0]
-    console.log(data)
-    $("#infoCod").val(data.codProduccion);
-    $("#infoTipo").val(data.producto);
-    $("#infoDescripcion").val(data.descripcion);
-
-    if(data.detalleProducto.metodoCalculo.codMetodo == 1){
-        $("#dimensiones").hide()
-    }
-    else{
-        $("#dimensiones").show()
-        $("#ancho").val(data.detalleProducto.medidas.ancho)
-        $("#alto").val(data.detalleProducto.medidas.alto)
-    }
-
-    $("#checkAprovado").prop("checked", data.aprovado);
-
-    if(data.archivos != undefined){
-        for(let i = 0; i<data.archivos.length; i++){
-            var newRow = $("<tr>");
-            var cols = "";
-            cols += '<td><a href="/files?codPedido='+ data.codPedido + '&codDet='+ data.codDetalle +'&filename='+ data.archivos[i].nombre +'" > '  +data.archivos[i].nombre+"</a></td>";
-            newRow.append(cols);
-            cols = '<td><button type="button" class="btn btn-primary">Descargar</button></td>'
-            newRow.append(cols);
-            $("#infoArchivos").append(newRow);
-        }  
-    }
-    if(data.diseños != undefined){
-        for(let i = 0; i<data.diseños.length; i++){
-            console.log(i)
-            var newRow = $("<tr>");
-            var cols = "";
-            cols += '<td><a href="/get_disenios?ruta='+ data.diseños[i].ruta +'" > '  + data.diseños[i].descripcion+"</a></td>";
-            newRow.append(cols);
-            cols = '<td><button type="button" class="btn btn-primary">Descargar</button> <button type="button" value='+ data.diseños[i].descripcion +' onclick="eliminarDisenio('+ "'" + data.diseños[i].descripcion + "'" +')" class="btn btn-danger">Eliminar</button></td>'
-            newRow.append(cols);
-            $("#infoDisenios").append(newRow);
-        }
-    }
-    if(data.etapa.codEtapa == 0){
-        $("#btnProduccion").html('Iniciar Producción')
+    $('#guardarTerminados').prop('disabled', true)
+    var cant = await enviarTerminados(data)
+    console.log(cant)
+    $('#guardarTerminados').prop('disabled', false)
+    var producido = cant.cantidad - cant.cantidadRestante
+    $('#progreso').css("width", producido*100 / cant.cantidad+"%")
+    $('#progreso-p').html(producido + ' de ' + cant.cantidad)
+    $('#terminado').val('')
+    $("#terminado").attr({
+        "max" : cant.cantidadRestante,
+    })
+    if(cant.cantidadRestante <= 0){
+        $('#terminado-modal').modal('show')
+        $('#btn-terminar').focus()
+        $('#producido').html(producido)
+        $('#total').html(cant.cantidad)
     }else{
-        if((data.etapa.codEtapa == 1)){
-            $("#btnProduccion").html('Continuar Producción')
+        if(cant.cantidadRestante < cant.cantidad){
+            $('#pausar-openModal').hide()
+            var button = '<button type="button" class="btn btn-secondary" id="pausar-openModal" data-bs-toggle="modal" data-bs-target="#pausar-modal">Pausar Produccion</button>'
+            $('#botonesEstado').append(button)
+            $('#cancelarProduccion').hide()
         }
     }
-    //$("#infoDisenios").html('');
-    $("#infoCant").val((data.cantidad-data.cantidadRestante) + " de "+ data.cantidad)
-}
 
-$("#aggDiseño").on("click", async function(){
-    if(document.getElementById("files").value != ''){
-        let form = document.getElementById("formDiseño")
-        let desing = new FormData(form);
-        desing.append("cod_pedido", data.codPedido);    
-        desing.append("cod_detalle", data.codDetalle);
-        desing.append("cod_produccion", data.codProduccion)
-        console.log(desing.get("cod_pedido"))
-        console.log(desing.get("cod_detalle"))
-        console.log(desing.get("cod_produccion"))
-        console.log(desing.get("files"))
-        $("#aggDiseño").prop("disabled", true)
-        files = await uploaDesign(desing);
-        $("#aggDiseño").prop("disabled", false)
-        for(let i = 0; i<files.length; i++){
-            var newRow = $("<tr>");
-            var cols = "";
-            cols += '<td><a href="/get_disenios?ruta='+ files[i].ruta +'" > '  +files[i].descripcion+"</a></td>";
-            newRow.append(cols);
-            cols = '<td><button type="button" class="btn btn-primary">Descargar</button> <button type="button" value='+ files[i].descripcion +' onclick="eliminarDisenio('+ "'" + files[i].descripcion + "'" +')" class="btn btn-danger">Eliminar</button></td>'
-            newRow.append(cols);
-            $("#infoDisenios").append(newRow);
-        }
-      }else
-        files = []
-    document.getElementById("files").value = ''
-});
-
-$("#checkAprovado").change( async function(){
-    let estado = {
-        "estado": $('#checkAprovado').is(":checked"),
-        "codProduccion": data.codProduccion
-    }
-    console.log(estado)
-    $("#checkAprovado").prop("disabled", true)
-    await aprovacion(estado)
-    $("#checkAprovado").prop("disabled", false)
 })
 
-async function eliminarDisenio(filename){
-    console.log("click")
-    await deleteDesing(data.codPedido, data.codDetalle, data.codProduccion, filename)
-    await info(data.codProduccion)
-}
+$('#cancelarProduccion').click(async function(){
+    $('#cancelarProduccion').prop('disabled', true)
+    await cancelarProduccion(codProduccion)
+    $('#cancelarProduccion').prop('disabled', false)
+    $('#cancelarProduccion').hide()
+    window.location.href = "/trabajos/orden_trabajo"
+
+})
+
+$('#pausarProduccion').click(async function(){
+    $('#pausarProduccion').prop('disabled', true)
+    await pausarProduccion(codProduccion)
+    $('#pausarProduccion').prop('disabled', false)
+    window.location.href = "/trabajos/orden_trabajo"
+
+})
+
+$('#btn-terminar').click(function(){
+    window.location.href = "/trabajos/orden_trabajo"
+})
+
+$('#solicitarInsumo').click(async function(){
+    var cantidad = $('#cantidadPerdidad')
+    var comentarios = $('#comentarios')
+    var insumo = $('#insumo')
+    
+    if(cantidad.val()<=0){
+        cantidad.focus()
+        return 0;
+    }
+    if(comentarios.val() == ''){
+        comentarios.focus();
+        return 0;
+    }
+    var datos = {
+        'codInsumo': insumo.val(),
+        'codProduccion': codProduccion,
+        'cantidad': cantidad.val(),
+        'comentarios': comentarios.val()
+    }
+    console.log(datos)
+    $(this).prop('disabled', true)
+    var info = await solicitarInsumos(datos)
+    console.log(info)
+    if(info == false){
+        $('#alertPedida').addClass('alert-danger')
+        $('#alertPedida').html('No se cuenta con el stock suficiente del insumo solicitado')
+    }
+    else{
+        $('#alertPedida').html('')
+        $('#alertPedida').removeClass('alert-danger')
+    }
+    $(this).prop('disabled', false)
+    cantidad.val(0)
+    comentarios.val('')
+
+$('#solicitarInsumo-btn').click(function(){
+    $('#alertPedida').html('')
+    $('#alertPedida').removeClass('alert-danger')
+})
+
+
+})

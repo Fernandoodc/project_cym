@@ -31,7 +31,6 @@
                   <label for="inputText" class="col-sm-2 col-form-label">CI - Cliente</label>
                   <div class="col-sm-5" id="divDocumento">
                     <input type="text" class="form-control" id="documento">
-                    <small id="alertText" class="form-text text-danger"></small>
                   </div>
                   <div class="col-sm-5">
                       <button type="button" class="btn btn-secondary" onclick="get_client()" id="buscar"><i class="ri-search-2-line"></i></button>
@@ -46,35 +45,33 @@
                               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                
                               <div id="newCliente">
                                     <div class="alert" id="alertNuevoCliente"></div>
                                     <div class="row mb-3">
-                                        <label for="inputText" class="col-sm-2 col-form-label">CI/RUC</label>
+                                        <label for="inputText" class="col-sm-2 col-form-label">CI/RUC<span class="text-danger">*</span></label>
                                         <div class="col-sm-10">
                                           <input type="text" id="newDocumento" class="form-control">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label for="inputText" class="col-sm-2 col-form-label">Nombre</label>
+                                        <label for="inputText" class="col-sm-2 col-form-label">Nombre<span class="text-danger">*</span></label>
                                         <div class="col-sm-10">
                                           <input type="text"  id="newNombre" class="form-control">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                      <label for="inputText" class="col-sm-2 col-form-label">Apellido</label>
+                                      <label for="inputText" class="col-sm-2 col-form-label">Apellido<span class="text-danger">*</span></label>
                                       <div class="col-sm-10">
                                         <input type="text"  id="newApellido" class="form-control">
                                       </div>
                                   </div>
                                     <div class="row mb-3">
-                                        <label for="inputText" class="col-sm-2 col-form-label">Nacionalidad</label>
+                                        <label for="inputText" class="col-sm-2 col-form-label">Nacionalidad<span class="text-danger">*</span></label>
                                         <div class="col-sm-10">
                                             <select class="form-select" aria-label="Default select example" id="newNacionalidad">
-                                              <option selected>Paraguaya</option>
-                                              <option value="1">Argentina</option>
-                                              <option value="2">Uruguaya</option>
-                                              <option value="3">Brasilera</option>
+                                              <option selected value="PY">Paraguaya</option>
+                                              <option value="AR">Argentina</option>
+                                              <option value="BR">Brasilera</option>
                                             </select>
                                           </div>
                                     </div>
@@ -108,7 +105,7 @@
                                         <button type="button" id="cancelarNewCliente" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                         <button type="button" id="aggCliente" class="btn btn-success">Guardar</button>
                                     </div>
-                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -116,30 +113,50 @@
                   </div>
                 </div>
                 <div class="row mb-3">
-                    <label for="inputText" class="col-sm-2 col-form-label">Nombre</label>
+                    <label for="inputText" class="col-sm-2 col-form-label">Nombre<span class="text-danger">*</span></label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" id="nombre" disabled>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="inputText" class="col-sm-2 col-form-label">Celular</label>
-                    <!-- <div class="col-sm-3">
-                        <select class="form-select" aria-label="Default select example">
-                          <option value="PY" selected>+595</option>
-                          <option value="AR">+549</option>
-                          <option value="UR">+598</option>
-                          <option value="BR">+55</option>
-                        </select>
-                      </div> -->
                     <div class="col-sm-10">
                       <input type="number" id="numCelular" class="form-control" disabled>
                     </div>
                 </div>
+                <div class="row mb-3">
+                  <label for="inputDate" class="col-sm-2 col-form-label" >Fecha Pedido<span class="text-danger">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="date" class="form-control" id="fecha_pedido">
+                  </div>
+              </div>
+              <div class="row mb-3">
+                  <label for="inputDate" class="col-sm-2 col-form-label">Fecha Entrega<span class="text-danger">*</span></label>
+                  <div class="col-sm-10">
+                    <input type="datetime-local" class="form-control" id="fecha_entrega">
+                  </div>
+              </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Delivery<span class="text-danger">*</span></label>
+                <div class="col-sm-1">
+                  <input class="form-check-input infoPedido" type="checkbox" id="checkDelivery">
+                </div>
+                <label class="col-sm-2 col-form-label direccion">Dirección<span class="text-danger">*</span></label>
+                <div class="col-sm-7">
+                  <input type="text" class="form-control direccion infoPedido" id="direccion" >
+                </div>
+              </div>
+              <div class="row mb-3 changeInfo " hidden>
+                <div class="col-sm-1">
+                  <button type="button" class="btn btn-success"  id="saveChange-btn"><i class="ri-save-3-line"></i></button>
+                </div>
+              </div>
+              <hr>
                 <!-- informacion del pedido -->
                 <div class="row mb-3" id="div_productos">
-                    <label class="col-sm-2 col-form-label">Producto</label>
+                    <label class="col-sm-2 col-form-label">Producto<span class="text-danger">*</span></label>
                     <div class="col-sm-10">
-                      <select class="form-select products-select" id="productos" aria-label="Default select example">
+                      <select class="form-select products-select" id="listaProductos" aria-label="Default select example">
                         {% for producto in productos %}
                         <option value="{{producto.codProducto}}">{{producto.codProducto}} - {{producto.descripcion}}</option>
                         {% endfor %}
@@ -161,7 +178,7 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                  <label for="inputText" class="col-sm-2 col-form-label">Cantidad</label>
+                  <label for="inputText" class="col-sm-2 col-form-label">Cantidad<span class="text-danger">*</span></label>
                   <div class="col-sm-10">
                     <input type="number" id="cantidad" class="form-control">
                   </div>
@@ -174,35 +191,7 @@
                     
                     </div>
                 </div>
-                <div class="row mb-3">
-                    <label for="inputDate" class="col-sm-2 col-form-label" >Fecha Pedido</label>
-                    <div class="col-sm-10">
-                      <input type="date" class="form-control" id="fecha_pedido">
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="inputDate" class="col-sm-2 col-form-label">Fecha Entrega</label>
-                    <div class="col-sm-10">
-                      <input type="datetime-local" class="form-control" id="fecha_entrega">
-                    </div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col-sm-10 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="checkDelivery">
-                            <label class="form-check-label" for="gridCheck1">
-                                Delivery
-                            </label>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3" id="divDireccion">
-                  <label for="inputText" class="col-sm-2 col-form-label">Dirección</label>
-                  <div class="col-sm-10">
-                    <input type="text" id="direccion" class="form-control">
-                  </div>
-                </div>
+              
                 <div class="row mb-3">
                   <label class="col-sm-2 col-form-label">Descuento</label>
                   <div class="col-sm-10">
@@ -218,10 +207,11 @@
                 <div class="row mb-3">
                   <div class="col-sm-10">
                     <button type="button" class="btn btn-primary" id="agregar"><i class="ri-add-line"></i></button>
-                    <button type="button" class="btn btn-success" id="terminar" data-bs-toggle="modal" data-bs-target="#Terminar-modal" disabled>Terminar</button>
+                    <button type="button" class="btn btn-success" id="terminar" data-bs-toggle="modal" data-bs-target="#Terminar-modal" >Terminar</button>
                     <button type="button" class="btn btn-danger" id="cancelar">Cancelar</button>
-                    <div class="modal fade" id="Terminar-modal" tabindex="-1">
-                      <div class="modal-dialog">
+                    
+                    <div class="modal fade" id="Terminar-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="eliminarProducto-title" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-s">
                         <div class="modal-content">
                           <div class="modal-header">
                             <h5 class="modal-title">Información del Pedido</h5>
@@ -230,22 +220,28 @@
                           <div class="modal-body">
                             <p><b>Codigo de Pedido:</b> <span class="codPedido"></span></p>
                             <p><b>Presupuesto Total:</b> <span class="total">0</span></p>
+                            <p id="saldo"></p>
                             <div class="mb-3 row">
                               <label for="sena" class="form-label"><b>Resgistrar Seña</b></label>
                               <div class="col-sm-8">
                                 <input type="number"
-                                class="form-control" name="sena" id="sena" aria-describedby="help" placeholder="monto">
-                              </div>
-                              <div class="col-sm-4">
-                                <button type="button" class="btn btn-secondary">Registrar</button>
+                                class="form-control" name="sena" id="monto" aria-describedby="help" placeholder="monto">
                               </div>
                               <small id="help" class="form-text text-danger"></small>
-                              
+                              <div class="col-sm-4">
+                                <button type="button" id="registrarPago" class="btn btn-secondary">Registrar</button>
+                              </div>
+                            </div>
+                            <div class="row mb-3">
+                              <div class="col sm-12">
+                                <button type="button" id="imprimirFactura" class="btn btn-secondary">Imprimir Factura</button>
+                                <button type="button" id="imprimirRecibo" class="btn btn-secondary">Imprimir Recibo</button>
+                              </div>
                             </div>
                           </div>
                           <div class="modal-footer">
-                            <button type="button" class="btn btn-primary">Imprimir Datos</button>
-                            <button type="button" class="btn btn-success" >Terminar</button>
+                            <button type="button" class="btn btn-primary" id="imprimirResumen">Imprimir Datos</button>
+                            <button type="button" class="btn btn-success" id="terminarPedido" >Terminar</button>
                           </div>
                         </div>
                       </div>
@@ -267,7 +263,6 @@
                         <th scope="col">Cant.</th>
                         <th scope="col">Archivos</th>
                         <th scope="col">Fecha de Entrega</th>
-                        <th scope="col">Delivery</th>
                         <th scope="col">Presupuesto</th>
                         <th scope="col">Acciones</th>
                       </tr>
@@ -296,6 +291,7 @@
 <script src="{{ url_for('static', path='/js/select2.min.js') }}"></script>
 <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
 <script src="{{ url_for('static', path='/js/func_pedidos.js') }}"></script>
+<script src="{{ url_for('static', path='/js/pagos.js') }}"></script>
 <script>
   const productos = {{productos | tojson}}
   const delivery = {{delivery.costoDelivery | tojson}}
@@ -307,4 +303,3 @@
 </script>
 <script src="{{ url_for('static', path='/js/pedidos.js') }}"></script>
 {% endblock %}
-

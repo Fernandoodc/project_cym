@@ -1,6 +1,20 @@
+$(document).ready(function(){
+    if($('#motivo :selected').val() == 'other'){
+        $('.otherMotivo').prop('hidden', false)
+    }else{
+        $('.otherMotivo').prop('hidden', true)
+    }
+})
+
 function actFecha(){
-    var fecha = facturas[$('#facturas').prop('selectedIndex')].fecha
-    $('#fecha').val(fecha)
+    if($('#facturas').prop('selectedIndex') > -1){
+        var fecha = facturas[$('#facturas').prop('selectedIndex')].fecha
+        $('#fecha').val(fecha)
+    }
+    else{
+        $('#fecha').val('')
+    }
+
     
 }
 $('#aggProveedor').click(async function(){
@@ -70,12 +84,13 @@ $('#aggFactura').click(async () => {
         'numeroFactura': $('#newNumeroFactura').val(),
         'Proveedores_id': $("#proveedores :selected").val()
     }
-    console.log(data)
+    //console.log(data)
     await agregarFactura(data)
-    $('#facturas').append($("<option>", {
+    /*$('#facturas').append($("<option>", {
         value: data.Proveedores_id,
         text: data.numeroFactura
-    }));
+    }));*/
+    await actListaFacturas()
     $('#alertNuevaFactura').html('')
     $('#newNumeroFactura').val('')
     $('#newFechaFactura').val('')
@@ -193,15 +208,68 @@ $('#limpiar').click(function(){
 })
 
 async function eliminarCompra(id){
-    await eliminarCompraAjax(id)
-    var precio = parseInt($('#total-'+id).html())
-    $('#total').html(parseInt($('#total').html()) - precio)
-    $('#'+id).hide()
+    if (await eliminarCompraAjax(id)){
+        var precio = parseInt($('#total-'+id).html())
+        $('#total').html(parseInt($('#total').html()) - precio)
+        $('#'+id).hide()
+    }
 
 }
 
 $("#proveedores").change(actListaFacturas)
 $('#facturas').change(function(){
     actFecha()
+})
+
+$('#motivo').change(function(){
+    if($('#motivo :selected').val() == 'other'){
+        $('.otherMotivo').prop('hidden', false)
+    }else{
+        $('.otherMotivo').prop('hidden', true)
+    }
+})
+
+$('#cancelar').click(function(){
+    location.reload()
+})
+$('#baja-btn').click(async function(){
+    var insumos = $('#insumo :selected')
+    var cantidad = $('#cantidad')
+    var motivo = $('#motivo :selected')
+    var otherMotivo = $('#otherMotivo') 
+    if(insumos.val() == ''){
+        insumos.focus()
+        return 0
+    }
+    if(cantidad.val()<= 0 || cantidad.val() == ''){
+        cantidad.focus()
+        return 0
+    }
+    if(motivo.val() == ''){
+        motivo.focus()
+        return 0
+    }
+    if(motivo.val() == 'other' && otherMotivo.val() == ''){
+        otherMotivo.focus()
+        return 0
+    }
+    var datos = {
+        codInsumo: insumos.val(),
+        cantidad: parseInt(cantidad.val()),
+        motivo: {
+            motivo_id: motivo.val(),
+        }
+    }
+    if(motivo.val() == 'other'){
+        datos.motivo.motivo_id = 'other',
+        datos.motivo.descripcion = otherMotivo.val()
+    }
+    console.log(datos)
+    $('#baja-btn').prop('disabled', true)
+    await bajaInsumo(datos)
+    location.reload()
+
+
+    
 })
 actListaFacturas();

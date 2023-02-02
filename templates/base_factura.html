@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+        <style>
+                .pageBreak {
+                        page-break-before: always;
+                }
+        </style>
+</head>
+
+<body>
+        {% for i in range(2) %}
+        <h2><span style="font-family: verdana, geneva, sans-serif;">C&amp;M EMPRENDIMIENTOS<img style="float: right;"
+                                src="https://scontent.fasu6-2.fna.fbcdn.net/v/t39.30808-6/306534663_2386157948191536_2913869615252838079_n.jpg?_nc_cat=111&amp;ccb=1-7&amp;_nc_sid=09cbfe&amp;_nc_ohc=ShiBawD7HdsAX-obZgl&amp;_nc_ht=scontent.fasu6-2.fna&amp;oh=00_AfDbXL0cahMNINYQtDT24bVLZbhkMML7I1zhcF2KA3SuZQ&amp;oe=63CDBA2E"
+                                alt="logo" width="153" height="155"
+                                data-cke-saved-src="https://scontent.fasu6-2.fna.fbcdn.net/v/t39.30808-6/306534663_2386157948191536_2913869615252838079_n.jpg?_nc_cat=111&amp;ccb=1-7&amp;_nc_sid=09cbfe&amp;_nc_ohc=ShiBawD7HdsAX-obZgl&amp;_nc_ht=scontent.fasu6-2.fna&amp;oh=00_AfDbXL0cahMNINYQtDT24bVLZbhkMML7I1zhcF2KA3SuZQ&amp;oe=63CDBA2E" /></span>
+        </h2>
+        <p><span style="font-family: verdana, geneva, sans-serif;"><strong>RUC: 5176642-6</strong></span></p>
+        <p><span style="font-family: verdana, geneva, sans-serif;">14 de Mayo Entre Iturbe y Libertad - CEL.: (0971)
+                        832614</span></p>
+        <p><span style="font-family: verdana, geneva, sans-serif;">TIMBRADO N&deg; 15963755 VALIDO HASTA ENERO
+                        2024</span>
+        </p>
+        <p><span style="font-family: verdana, geneva, sans-serif;">FACTURA N&deg; 001-002-{{numeroFactura}}</span></p>
+        <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                        <tr>
+                                <td style="width: 11.2159%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Fecha:</strong></span>
+                                </td>
+                                <td style="width: 56.4991%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{fecha}}</span>
+                                </td>
+                                <td style="width: 12.6834%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">Cond. Venta:</span>
+                                </td>
+                                <td style="width: 19.6016%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{%if ventaContado
+                                                == true %} Contado {% else %} Crédito {% endif %}</span></td>
+                        </tr>
+                        <tr>
+                                <td style="width: 11.2159%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Cliente:</strong></span>
+                                </td>
+                                <td style="width: 56.4991%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{cliente.nombre}}
+                                                {{cliente.apellido}}</span></td>
+                                <td style="width: 12.6834%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">RUC/CI</span></td>
+                                <td style="width: 19.6016%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{cliente.documento}}</span>
+                                </td>
+                        </tr>
+                        <tr>
+                                <td style="width: 11.2159%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Direcci&oacute;n:</strong></span>
+                                </td>
+                                <td style="width: 56.4991%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{cliente.direccion}}</span>
+                                </td>
+                                <td style="width: 12.6834%;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">Telefono:</span>
+                                </td>
+                                <td style="width: 19.6016%;"><span style="font-family: verdana, geneva, sans-serif;">
+                                                {{cliente.celular}}</span></td>
+                        </tr>
+                </tbody>
+        </table>
+        <br>
+        <table style="border-collapse: collapse; width: 100%; height: 66px;" border="1">
+                <tbody>
+                        <tr style="height: 22px;">
+                                <td style="width: 8.4906%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Cantidad</strong></span>
+                                </td>
+                                <td style="width: 40.9854%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Clase de
+                                                        Mercader&iacute;a y/o
+                                                        Servicios</strong></span></td>
+                                <td style="width: 20.3354%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Precio
+                                                        Unitario</strong></span></td>
+                                <td style="width: 20.3354%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>Descuento</strong></span></td>
+                                <td style="width: 6.49899%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>IVA%</strong></span>
+                                </td>
+                                <td style="width: 16.6667%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;"><strong>IMPORTE</strong></span>
+                                </td>
+                        </tr>
+                        {% for detalles in detalleFactura %}
+                        {% for detalle in detalles.detalles %}
+                        <tr style="height: 22px;">
+                                <td style="width: 8.4906%; text-align: center; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{ '{0:0,.0f}'.format(detalle.cantidad).replace(",", ".") }}</span>
+                                </td>
+                                <td style="width: 40.9854%; height: 22px;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{detalle.descripcionProducto}}</span>
+                                </td>
+                                <td style="width: 20.3354%; height: 22px; text-align: center;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{ '{0:0,.0f}'.format(detalle.precioUnitario).replace(",", ".") }}</span>
+                                </td>
+                                <td style="width: 20.3354%; height: 22px; text-align: center;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{ '{0:0,.0f}'.format(detalle.descuento).replace(",", ".") }}</span>
+                                </td>
+                                <td style="width: 6.49899%; height: 22px; text-align: center;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">10</span></td>
+                                <td style="width: 16.6667%; height: 22px; text-align: center;"><span
+                                                style="font-family: verdana, geneva, sans-serif;">{{ '{0:0,.0f}'.format(detalle.total).replace(",", ".") }}</span>
+                                </td>
+                        </tr>
+                        {% endfor %}
+                        {% endfor %}
+                </tbody>
+        </table>
+        <p><span style="font-family: verdana, geneva, sans-serif;">Subtotal: {{ '{0:0,.0f}'.format(subtotal).replace(",", ".") }} Gs.</span></p>
+        <p><span style="font-family: verdana, geneva, sans-serif;">Descuento: {{ '{0:0,.0f}'.format(descuento).replace(",", ".") }} Gs.</span></p>
+        <p><span style="font-family: verdana, geneva, sans-serif;">IVA 10% : {{ '{0:0,.0f}'.format(iva).replace(",", ".") }} Gs.</span></p>
+        <p><span style="font-family: verdana, geneva, sans-serif;">IVA 5% : 0</span></p>
+        <p><span style="font-family: verdana, geneva, sans-serif;"><strong>Total: {{ '{0:0,.0f}'.format(total).replace(",", ".") }} Gs.</strong></span></p>
+
+        <div class="pageBreak"></div>
+        {% endfor %}
+</body>
+
+</html>

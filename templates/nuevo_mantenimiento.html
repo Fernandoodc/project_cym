@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Nuevo Mantenimiento{% endblock %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <h1>Registar Mantenimiento</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+            <li class="breadcrumb-item">Equipos</li>
+            <li class="breadcrumb-item">Mantenimientos</li>
+            <li class="breadcrumb-item active">Registar Mantenimiento</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Datos</h5>
+                    <!-- General Form Elements -->
+                    <form id="aggEquipos">
+                        <div class="row mb-3">
+                            <label for="numeroSerie" class="col-form-label col-sm-2">Número de serie</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="numeroSerie" id="numeroSerie"
+                                    aria-describedby="" placeholder="" value="{{equipo.numSerie}}" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="div_marcas">
+                            <label class="col-sm-2 col-form-label">Marca</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" value="{{equipo.marcaEquipo.descripcion}}" disabled>
+                            </div>
+                            <label for="modelo" class="col-form-label col-sm-2">Modelo</label>
+                            <div class="col-sm-4">
+                                <input type="text"
+                                    class="form-control" name="modelo" id="modelo" aria-describedby="" placeholder="" value="{{equipo.modelo}}" disabled>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label">Tipo de Equipo</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" value="{{equipo.tipoEquipo.descripcion}}" disabled>
+                            </div>
+                            <label for="fecha" class="col-form-label col-sm-2">Fecha de Adquisición</label>
+                            <div class="col-sm-4">
+                                <input type="date"
+                                    class="form-control" name="fecha" aria-describedby="" placeholder="" value="{{equipo.fechaAdquisicion}}" disabled>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Fecha del Mantenimiento<span class="text-danger">*</span></label>
+                            <div class="col-sm-4">
+                                <input type="date" class="form-control" id="fechaMantenimiento">
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="div_tipoMantenimiento">
+                            <label class="col-sm-2 col-form-label">Tipo de Trabajo<span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="col-sm-10">
+                                        <select class="form-select insumos-select" id="tipoTrabajo"
+                                            aria-label="Default select example">
+                                            {% for tipo in tiposMatenimiento %}
+                                                <option value="{{tipo._id['$oid']}}">{{tipo.descripcion}}</option>
+                                            {% endfor %}
+                                            <option value="other">Otro</option>
+                                        </select>
+                                        <div class="row otherTipo">
+                                            <div class="col sm-12">
+                                                <div class="form-floating mb-3 mt-3">
+                                                    <input type="text" class="form-control" name="otherTipo"
+                                                        id="otherTipo" placeholder="Tipo">
+                                                    <label for="otherTipo">Tipo</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Descripción</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="" id="descripcion" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-10">
+                                <button type="button" class="btn btn-primary" id="agregarMantenimiento-btn"><i
+                                        class="ri-add-line"></i></button>
+                                <button type="button" class="btn btn-secondary" id="cancelar">Limpiar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="{{ url_for('static', path='/js/equipos.js') }}"></script>
+<script>
+    IDEQUIPO = {{equipo._id['$oid'] | tojson}}
+</script>
+{% endblock %}

@@ -157,10 +157,48 @@ db.pedidos.aggregate(
     ]
 )
 
-db.insumos.aggregate([
-    {
-        $project:{
-           "codInsumo": {$toInt: "$codInsumo"}
+db.produccion.aggregate(
+    [
+        {
+            $match: {
+                "codProduccion": "PE221252-1"
+            }
+        },
+        {
+            $lookup:{
+                from: "detallesPedidos",
+                localField: "detallesPedidos_id",
+                foreignField: "_id",
+                as: "detalle"
+            }
+        },
+        {
+            $unwind: "$detalle"
+        },
+        {
+            $lookup:{
+                from: "productos",
+                localField: "$detalle.detallePRo",
+                foreignField: "codDetalle",
+                as: "produccion"
+            }
+        },
+        {
+            $unwind: "$produccion"
+        },
+        {
+            $project:{
+                codProduccion: "$produccion.CodDetalle",
+                producto: "$producto.descripcion",
+                cantidadRestante: "$produccion.cantidadRestante",
+                cantidad: "$cantidad",
+                descripcion: "$descripcion",
+                fechaEntrega: "$fechaEntrega",
+                etapa:{
+                    codEtapa: "$produccion.etapa.codEtapa",
+                    descripcion: "$produccion.etapa.descripcion"
+                }
+            }
         }
-    }
-])
+    ]
+)

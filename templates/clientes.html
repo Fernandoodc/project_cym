@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
+{% block css %}
+  <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+{% endblock %}
+{% block content %}
+<div class="pagetitle">
+  <h1>Clientes</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+      <li class="breadcrumb-item active">Cliente</li>
+    </ol>
+  </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+  <div class="row">
+    <div class="col-lg-12">
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Clientes</h5>
+          <div class="table-responsive-sm">
+              <!-- Default Table -->
+            <table class="table table-hover display" id="listaClientes">
+              <thead>
+                <tr>
+                  <th scope="col">CI</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Apellido</th>
+                  <th scope="col">Estado de Cuenta</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                {% for cliente in clientes %}
+                <tr onclick="datosCliente('{{cliente._id['$oid']}}')" id="{{cliente._id['$oid']}}">
+                  <td class="documento">{{cliente.documento}}</td>
+                  <td class="nombre">{{cliente.nombre}}</td>
+                  <td class="apellido">{{cliente.apellido}}</td>
+                  <td class="text-danger saldo">{{cliente.saldo}}</td>
+                </tr>
+                {% endfor%}
+      
+              </tbody>
+            </table>
+            <div class="modal fade" id="infoCliente-modal" tabindex="-1" data-bs-backdrop="static" role="dialog"
+            aria-labelledby="infoCliente-modalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-xl" >
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title"  id="infoCliente-modalTitle">Informacion del cliente</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">CI/RUC</label>
+                                <div class="col-sm-10">
+                                  <input type="text" class="form-control" id="documento" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Nombre</label>
+                                <div class="col-sm-10">
+                                  <input type="text" class="form-control infoCliente" id="nombre" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                              <label for="inputText" class="col-sm-2 col-form-label">Apellido</label>
+                              <div class="col-sm-10">
+                                <input type="text" class="form-control infoCliente" id="apellido" disabled>
+                              </div>
+                          </div>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Nacionalidad</label>
+                                <div class="col-sm-10">
+                                    <select class="form-select infoCliente" id="nacionalidad" aria-label="Default select example" disabled>
+                                      <option selected value="PY">Paraguaya</option>
+                                      <option value="AR">Argentina</option>
+                                      <option value="BR">Brasilera</option>
+                                    </select>
+                                  </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Dirección</label>
+                                <div class="col-sm-10">
+                                  <input type="text" class="form-control infoCliente" id="direccion" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Celular</label>
+                                <div class="col-sm-9">
+                                <input type="text" class="form-control infoCliente" id="celular" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Email</label>
+                                <div class="col-sm-10">
+                                  <input type="email" class="form-control infoCliente" id="email" disabled>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="inputText" class="col-sm-2 col-form-label">Estado de Cuenta</label>
+                                <div class="col-sm-3">
+                                  <input type="email" class="form-control text-danger" id="saldo" disabled>
+                                </div>
+                                <div class="col-sm-1">
+                                    <button type="button" class="btn btn-success" id="abonar-btn">Abonar</button>
+                                </div>      
+                            </div>
+                            <div class="row mb-3">
+                              <div class="col-sm-2">
+                                <button type="button" class="btn btn-primary" id="historialPagos-btn">Historial de Pagos </button>
+                              </div>
+                              <div class="col-sm-2">
+                                <button type="button" class="btn btn-primary" id="historialPedidos-btn">Historial de Pedidos</button>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="editar-cliente">Editar</button>
+                                <button type="button" class="btn btn-success" id="guardar" >Guardar</button>
+                              </div>
+                          </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <!-- End Default Table Example -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/clientes.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+        $('#listaClientes').DataTable({
+        language: spanish,
+        
+         });
+    });
+    </script>
+{% endblock %}
+</body>
+
+</html>
