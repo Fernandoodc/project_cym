@@ -17,7 +17,7 @@ from pymongo import ReturnDocument, MongoClient
 from functions import equipos, usuarios
 Equipos = APIRouter()
 templates = Jinja2Templates(directory="templates")
-client = MongoClient(settings.MONGODB_SERVER)
+client = MongoClient(settings.MONGODB_URI)
 db = client[settings.MONGODB_DB]
 
 UPermitidos = [1]

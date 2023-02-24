@@ -1,7 +1,8 @@
 from pymongo import MongoClient, ReturnDocument, errors
 from pydantic import BaseModel
-client = MongoClient("localhost")
-db = client['cym']
+from config import settings
+client = MongoClient(settings.MONGODB_URI)
+db = client[settings.MONGODB_DB]
 #return None si no encuentra nada
 #return true si encuentra algo
 #return false si ocurre algun error

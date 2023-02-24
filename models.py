@@ -6,7 +6,18 @@ from datetime import datetime
 
 class tokenUser(BaseModel):
     username: str
-    typeUser: int
+    codTipoUsuario: int
+    nombre: str
+    apellido: str
+
+class costoDelivery(BaseModel):
+    costoDelivery: int
+class senas(BaseModel):
+    monto: int
+
+class configuraciones(BaseModel):
+    delivery: costoDelivery
+    senas: senas
 
 class Usuarios(Document):
     username = StringField()
@@ -23,7 +34,9 @@ class datosUsuario(username):
     Nacionalidades_id: str
     email: str = ''
     direccion : str =''
-
+class changePasw(BaseModel):
+    currentPasw: str
+    newPasw: str
 class newUser(datosUsuario):
     password:str
     codTipoUsuario : int
@@ -120,6 +133,10 @@ class insumo(BaseModel):
     stockMin : int
     tipoInsumo_id : int
 
+class editInsumo(BaseModel):
+    descripcion : str
+    stockMin: str
+
 class compraInsumo(BaseModel):
     cantidad : int
     precioUnitario : int
@@ -147,13 +164,13 @@ class perdida(BaseModel):
     comentarios: str
 
 class pagos(BaseModel):
-    fecha: str = datetime.now().strftime("%Y-%m-%d")
+    fecha: str = datetime.now().strftime("%d-%m-%Y")
     monto: int
     codPedido: str
     cliente_id: str
 
 class factura(BaseModel):
-    fecha: str = datetime.now().strftime("%Y-%m-%d")
+    fecha: str = datetime.now().strftime("%d-%m-%Y")
     codPedido: List[str]
     cliente_id : str
 

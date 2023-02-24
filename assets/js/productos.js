@@ -127,6 +127,7 @@ function eliminarMayorista(cant, precio){
             i = -1
         }
     }
+    console.log('hh')
     $('.'+cant+'-'+precio).remove()
 }
 

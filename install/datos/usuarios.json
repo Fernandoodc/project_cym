@@ -1,0 +1,12 @@
+[{
+  "username": "admin",
+  "password": "pbkdf2:sha256:260000$sduFXVnyhVVnGRkt$593abe631223f0fa78fcbab6341d44f60aca9bd50adfe110c07825f415a0ae9c",
+  "codTipoUsuario": 1,
+  "apellido": "Root",
+  "celular": "555-555-555",
+  "direccion": "",
+  "documento": "000000",
+  "email": "mail@mail.com",
+  "nombre": "Administrador",
+  "Nacionalidades_id": "PY"
+}]

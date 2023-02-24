@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% block title %}Pedidos{% endblock %}
+{% block css %}
+<link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
+{% endblock %}
+{% block content %}
+
+<div class="pagetitle">
+  <h1>Lista de Pedidos</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+      <li class="breadcrumb-item">Pedidos</li>
+      <li class="breadcrumb-item active">Lista de Pedidos</li>
+    </ol>
+  </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+  <div class="row">
+    <div class="col-lg-12">
+
+      <div class="card">
+        <div class="card-body">
+
+
+          <div class="table-responsive mt-3">
+            <!-- Default Table -->
+            <div class="modal fade" id="detallePedido" tabindex="-1">
+              <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Informacion del pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="alert alert-danger alert-dismissible fade show" id="alertPedidos" role="alert" hidden>
+                    <span id="alertPedidos-span"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label">Codigo de Pedido</label>
+                      <div class="col-sm-2">
+                        <input type="text" class="form-control" id="infoCod" value="PE22111" disabled>
+                      </div>
+                      <label class="col-sm-1 col-form-label">Fecha Entrega</label>
+                      <div class="col-sm-3">
+                        <input type="datetime-local" class="form-control infoPedido" id="fecha_entrega" value=""
+                          disabled>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label class="col-sm-1 col-form-label">Delivery</label>
+                      <div class="col-sm-1">
+                        <input class="form-check-input infoPedido" type="checkbox" id="checkDelivery" disabled>
+                      </div>
+                      <label class="col-sm-2 col-form-label direccion">Dirección</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control direccion infoPedido" id="direccion" disabled>
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label">Estado de Cuenta</label>
+                      <label class="col-sm-4 col-form-label"><b>Presupuesto Total:</b> <span id="total">0</span></label>
+                      <label class="col-sm-4 col-form-label" id="saldo"><b>Saldo: </b></label>
+
+                    </div>
+                    <div class="row mb-3 ">
+                      <div class="col-sm-12 entregar-btn">
+                        <button type="button" id="entregarPedido-btn" class="btn btn-primary">Entregar Pedido/s</button>
+                        <button type="button" id="abonarPedido-btn" class="btn btn-primary">Abonar</button>
+                        <button type="button" class="btn btn-success changeInfo" id="saveChange-btn" title="Guardar" hidden><i
+                          class="ri-save-3-line"></i></button>
+                      </div>
+                    </div>
+
+                    <hr>
+                    <div id="detallesPedido-div">
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Producto</label>
+                        <div class="col-sm-10">
+                          <input type="text" id="infoProducto" class="form-control" value="" disabled>
+                        </div>
+                      </div>
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Descripción</label>
+                        <div class="col-sm-10">
+                          <textarea class="form-control infoPedido" id="infoDescripcion" style="height: 100px"
+                            disabled>Lorem ipsum</textarea>
+                        </div>
+                      </div>
+                      <div id="dimensiones" class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Dimensiones</label>
+                        <div class="col-sm-5">
+                          <label class="col-sm-3 col-form-label">Ancho</label>
+                          <input type="number" class="form-control infoPedido" id="ancho" disabled>
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="col-sm-3 col-form-label">Alto</label>
+                          <input type="number" class="form-control infoPedido" id="alto" disabled>
+                        </div>
+                      </div>
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Cantidad</label>
+                        <div class="col-sm-4">
+                          <input type="number" id="infoCantidad" min="0" class="form-control infoPedido" value="0" disabled>
+                        </div>
+                      </div>
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">Archivos</label>
+                        <div class="col-sm-10">
+                          <div class="table-responsive">
+                            <table class="table table-hover" id="tableDiseños">
+                              <thead>
+                                <tr>
+                                  <th scope="col">Archivos</th>
+                                  <th scope="col">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="infoArchivos">
+                              </tbody>
+                            </table>
+                          </div>
+                          <form method="post" enctype="multipart/form-data" id="formArchivos">
+                            <input type="file" class="form-control infoPedido" name="files" id="files" multiple
+                              disabled>
+                            <button type="button" id="aggArchivo" class="btn btn-primary infoPedido" disabled>Agregar
+                              Archivo</button>
+                          </form>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div id="abonar-div">
+                      <div class="container-fluid">
+                        <div class="mb-3 row">
+                          <div class="col-sm-8">
+                            <input type="number" class="form-control" name="sena" id="monto" aria-describedby="help"
+                              placeholder="monto">
+                          </div>
+                          <small id="help" class="form-text text-danger"></small>
+                          <div class="col-sm-4">
+                            <button type="button" id="registrarPago" class="btn btn-primary">Registrar</button>
+                            <button type="button" id="imprimirRecibo" class="btn btn-secondary">Imprimir Recibo</button>
+                          </div>
+                        </div>
+                        <div class="row mb-3" id="btn-factura-div">
+                          <div class="col-sm-12">
+                            <button type="button" class="btn-printFactura btn btn-success" id="imprimirFactura"
+                              class="btn btn-secondary">Imprimir Factura</button>
+                            <input class="form-check-input otherCliete" type="checkbox" value="1" id="otherCliete">
+                            <label class="form-check-label otherCliete" for="otherCliete">
+                              Generar a nombre de otra persona
+                            </label>
+                          </div>
+                        </div>
+                        <div id="newCliente" class="row">
+                          <div class="alert" id="alertNuevoCliente"></div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">CI/RUC<span
+                                class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                              <input type="text" id="newDocumento" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Nombre<span
+                                class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                              <input type="text" id="newNombre" class="form-control infoCliente">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Apellido<span
+                                class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                              <input type="text" id="newApellido" class="form-control infoCliente">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Nacionalidad<span
+                                class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                              <select class="form-select infoCliente" aria-label="Default select example"
+                                id="newNacionalidad">
+                                <option selected value="PY">Paraguaya</option>
+                                <option value="AR">Argentina</option>
+                                <option value="BR">Brasilera</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Dirección</label>
+                            <div class="col-sm-10">
+                              <input type="text" id="newDireccion" class="form-control infoCliente">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Celular</label>
+                            <div class="col-sm-10">
+                              <input type="number" id="newCelular" class="form-control infoCliente">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Email</label>
+                            <div class="col-sm-10">
+                              <input type="email" id="newEmail" class="form-control infoCliente">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <div class="col-sm-12">
+                              <button type="button" id="printFactura" class="btn btn-success">Generar Factura</button>
+                            </div>
+                          </div>
+
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mb-3" id="resultEdicion" hidden></div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" id="btnEditar">Editar</button>
+                    <button class="btn btn-danger" id="eliminar-btn">Eliminar</button>
+                    <button class="btn btn-primary" id="btnGuardar" hidden title="Guardar"><i class="ri-save-3-line"></i></button>
+                    <button type="button" id="imprimirResumen" class="btn btn-primary">Imprimir Resumen</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="eliminarDet-modal" tabindex="-1" role="dialog" aria-labelledby="eliminarDet-title" aria-hidden="true">
+              <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                  <div class="modal-body">
+                    <div class="consulta" >
+                      <h5>¿Seguro que desea eliminar el pedido?</h5>
+                      <hr>
+                      <p class="consulta"><b>Presupuesto Total:</b>  <span id="presuTotal" ></span></p>
+                      <p><b>Presupuesto Particular:</b>  <span id="presuIndi" ></span></p>
+                      <p><b>Abonado:</b>  <span id="abonado" ></span>
+                      </p>
+                    </div>
+                    <p class="vuelto"><b>Vuelto:</b> <span></span><br>
+                      <small>Vuelto por sobrante del pago ya realizado</small>
+                    </p>
+                    <p></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary consulta" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary cerrarModal" data-bs-dismiss="modal">Cerrar</button>
+                    <a id="printFactura" class="btn btn-success printFactura" role="button">Imprimir Factura</a>
+                    <button type="button" id="eliminarDetalle" class="btn btn-danger consulta">Eliminar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            
+            
+            
+            <table class="table 
+              table-hover	
+              table-borderless
+              align-middle display nowrap" id="listaPedidos">
+              <thead>
+                <tr>
+                  <th scope="col">Cod.</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Producto</th>
+                  <th scope="col">Fecha</th>
+                  <th>Delivery</th>
+                  <th>Producción</th>
+                  <th>Entregado?</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
+            <!-- End Default Table Example -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<!-- Template Main JS File -->
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+<script src="/static/js/dataTables.responsive.min.js"></script>
+<script src="/static/js/dataTables.rowGroup.min.js"></script>
+<script src="/static/js/funciones_ajax.js"></script>
+<script src="/static/js/pedidos.js"></script>
+<script src="/static/js/pagos.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $('#listaPedidos').DataTable({
+      language: spanish,
+      order: [[0, 'desc']],
+      rowGroup: {
+        dataSrc: 0
+      },
+      ajax : {
+        'url': '/pedidos/serverside',
+        dataSrc:
+      },
+      columns: [
+        {
+          data: 'codPedido',
+          data: 'cliente.nombre',
+          data: 'producto.descripcion',
+          data: 'fecha',
+          data: 'infoDelivery.solicitado',
+          data: 'produccion.estado.descripcion',
+          data: 'pedido.entrega.entregado'
+        }
+      ]
+    });
+  });
+  console.log(spanish)
+</script>
+{% endblock %}
+</body>
+
+</html>

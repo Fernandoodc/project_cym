@@ -65,7 +65,7 @@
                                     <td>{{perdido.insumo.descripcion}}</td>
                                     <td>{{perdido.cantidad}}</td>
                                     <td>{{perdido.fecha}}</td>
-                                    <td>{{perdido.datosEmpleado.Nombre}} {{perdido.datosEmpleado.Apellido}}</td>
+                                    <td> <a href="/usuarios/?id={{perdido.datosEmpleado.Usuarios_id['$oid']}}" target="_blank" rel="noopener noreferrer">{{perdido.datosEmpleado.Nombre}} {{perdido.datosEmpleado.Apellido}}</a></td>
                                     <td><a href="/trabajos/orden_trabajo?codProduccion={{perdido.Produccion_id}}" target="_blank" rel="noopener noreferrer">{{perdido.Produccion_id}}</a></td>
                                     <td>{{perdido.comentarios}}</td>
                                 </tr>

@@ -14,7 +14,7 @@ from models import productos
 from functions import infoProductos
 Productos = APIRouter()
 templates = Jinja2Templates(directory="templates")
-client = MongoClient(settings.MONGODB_SERVER)
+client = MongoClient(settings.MONGODB_URI)
 db = client[settings.MONGODB_DB]
 @Productos.get("/productos")
 async def listaDeProductos(request: Request, user=Depends(manager)):
@@ -23,14 +23,14 @@ async def listaDeProductos(request: Request, user=Depends(manager)):
 
 @Productos.get("/nuevo_producto")
 async def nuevoProducto(request: Request, user=Depends(manager)):
-    insumos = db['insumos'].find()
+    insumos = db['insumos'].find({'tipoInsumo_id': { '$ne': 3 }})
     return templates.TemplateResponse("nuevo_producto.html", context={'request': request, 'insumos': insumos, 'userInfo': user})
 
 @Productos.post("/agregar_producto")
 async def agregarProducto(response: Response, producto: productos, user=Depends(manager)):
     for i in range(0, len(producto.preciosMayoristas)):
         for j in range(0, len(producto.preciosMayoristas)-1):
-            if producto.preciosMayoristas[j]['cantidad']>producto.preciosMayoristas[j+1]['cantidad']:
+            if producto.preciosMayoristas[j].cantidad > producto.preciosMayoristas[(j+1)].cantidad:
                 aux = producto.preciosMayoristas[j]
                 producto.preciosMayoristas[j] = producto.preciosMayoristas[j+1]
                 producto.preciosMayoristas[j+1] = aux
@@ -53,9 +53,10 @@ async def editarProducto(response: Response, producto: productos, user=Depends(m
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     anterior = db['productos'].find_one({'codProducto': producto.codProducto})
     nuevo = loads(producto.json())
+    usuario_id = db['usuarios'].find_one({'username': user.username})
     datosAuditoria = {
         'fecha': datetime.now().strftime("%y-%m-%d %H:%M"),
-        'usuario': user.username,
+        'usuario': usuario_id['_id'],
         'codProducto': producto.codProducto,
         'accion': 'editar',
         'anterior': anterior,
@@ -66,11 +67,17 @@ async def editarProducto(response: Response, producto: productos, user=Depends(m
 
 @Productos.post('/eliminar_producto')
 async def eliminarProducto(response: Response, codProducto: str, user=Depends(manager)):
+    usuario_id = db['usuarios'].find_one({'username': user.username})
+    anterior = db['productos'].find_one({'codProducto': codProducto})
+    if infoProductos.controlDelete(codProducto) == False:
+        response.status_code = status.HTTP_409_CONFLICT
+        return {'msg': 'Aún existen pedidos sin entregar o terminar con este producto, no se puede eliminar'}
     datos = {
         'codProducto': codProducto,
         'fecha': datetime.now().strftime("%y-%m-%d %H:%M"),
-        'usuario': user.username,
-        'accion': 'eliminar'
+        'usuario': usuario_id['_id'],
+        'accion': 'eliminar',
+        'anterior': anterior,
     }
     db['auditoriaProductos'].insert_one(datos)
     db['productos'].delete_one({'codProducto': codProducto})

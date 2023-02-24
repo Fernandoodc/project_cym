@@ -138,7 +138,7 @@
                                     </thead>
                                     <tbody id="mayoristas-tbody">
                                         {% for mayorista in producto.preciosMayoristas %}
-                                            <tr>
+                                            <tr class="{{mayorista.cantidad}}-{{mayorista.precio}}">
                                                 <td>
                                                     {{mayorista.cantidad}}
                                                 </td>

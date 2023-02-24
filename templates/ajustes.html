@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Ajustes del Sistema</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item active">Ajustes</li>
+        </ol>
+    </nav>
+</div>
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Configuraciones Básicas</h5>
+                    <form id="ajustes-form">
+                        <div class="row mb-3 mt-3">
+                            <label for="costoDelivery" class="col-form-label col-sm-2">Costo Delivery</label>
+                            <div class="col-sm-5">
+                                <input type="number" min="0" class="form-control" name="costoDelivery" id="costoDelivery"
+                                    value="{{ajustes.delivery.costoDelivery}}" placeholder="Gs." required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="montoSena" class="col-form-label col-sm-2 ">Seña Requerida Desde</label>
+                            <div class="col-sm-5">
+                                <input type="number" class="form-control" name="montoSena" id="montoSena" aria-describedby="senaInfo"
+                                placeholder="Gs." value="{{ajustes.senas.monto}}" required>
+                            <small id="senaInfo" class="form-text text-muted">Monto desde el cual se solicitirá una seña del
+                                50% para pasar a producción</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="guardar-btn">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock%}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="/static/js/ajustes.js"></script>
+{% endblock %}

@@ -51,7 +51,7 @@
                                             <td>{{pago.monto}}</td>
                                             <td>{{cuenta.total}}</td>
                                             <td>{{pago.saldo}}</td>
-                                            <td>{{pago.numeroRecibo}}</td>
+                                            <td><a href="/pagos/imprimir_recibo/{{pago.numeroRecibo}}" target="_blank" rel="noopener noreferrer">{{pago.numeroRecibo}}</a></td>
                                             <td>
                                                 <ul>
                                                     {% for detalle in cuenta.detallesPedido %}

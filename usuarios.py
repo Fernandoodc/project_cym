@@ -14,7 +14,7 @@ from mongo import delete_one, delete_many, find_one, find, update_one
 from functions import usuarios
 from config import settings
 
-client = MongoClient(settings.MONGODB_SERVER)
+client = MongoClient(settings.MONGODB_URI)
 db = client[settings.MONGODB_DB]
 Usuarios = APIRouter()
 
@@ -27,7 +27,7 @@ async def listaUsuarios(request: Request, id:str='', user=Depends(manager)):
     users = json_util._json_convert(usuarios.listaUsuarios())
     nacionalidades = db['nacionalidades'].find()
     tiposUsuario = db['tiposUsuarios'].find()
-    return templates.TemplateResponse('usuarios.html', context={'request': request, 'usuarios': users, 'nacionalidades': nacionalidades, 'tiposUsuarios': tiposUsuario, 'userInfo': user})
+    return templates.TemplateResponse('usuarios.html', context={'request': request, 'usuarios': users, 'nacionalidades': nacionalidades, 'tiposUsuarios': tiposUsuario, 'id':id, 'userInfo': user})
 
 @Usuarios.get('/nuevo_usuario')
 async def nuevoUsuario(request: Request, user=Depends(manager)):

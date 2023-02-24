@@ -6,9 +6,10 @@ from fastapi import Request, Response
 from fastapi import status
 from fastapi import Depends
 from fastapi.responses import RedirectResponse
-from mongo import find, find_one, agreggate
+from mongo import find, update_one
 from bson import json_util, objectid
 from mongo import find_one
+from models import changePasw
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import settings
 from jose import jwt
@@ -46,34 +47,22 @@ async def create_token(request: Request, response: Response, form_data: OAuth2Pa
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     return templates.TemplateResponse('login.html', context={'request': request, 'error': error})
 
-"""""
-@Login.get("/")
-async def form_login(request: Request):
-    token = request.cookies.get("access_token")
-    validation = await login.get_current_user(token=token, required_bool=True)
-    if validation:
-         return RedirectResponse("/index")
-    error = []
-    return templates.TemplateResponse('login.html', context={'request': request,'error': error})
+@Login.get('/profile')
+async def profile(request: Request, user=Depends(manager)):
+    usuario = find('usuario', {'username': user.username})
+    return templates.TemplateResponse('users-profile.html', context={'request': request, 'usuario': usuario, 'userInfo': user})
 
-@Login.post("/")
-def retrieve_token_for_authenticated_user(request:Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
-    error = []
-    try:
-        if form_data.username and form_data.password:
-            user = find_one('usuarios', {'username': form_data.username})
-            if user != None:
-                print(user['username'])
-                if check_password_hash(user['password'], form_data.password):
-                    data = {"sub": form_data.username, "typeUser": user['codTipoUsuario']}
-                    jwt_token = jwt.encode(data, settings.SECRET_KEY, settings.ALGORITHM)
-                    response = RedirectResponse("/index")
-                    response.set_cookie(key="access_token", value=f"Bearer {jwt_token}", httponly=True)
-                    return response
-            error.append('Usuario o Contraseña Incorrecta')
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-    except:
-        error.append("Ocurrió un Error Interno")
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    return templates.TemplateResponse('login.html', context={'request': request, 'error': error})
-"""
+@Login.put('/update_passw')
+async def actualizarPassword(response: Response, pasw : changePasw, user=Depends(manager)):
+    usuario = query_user(user.username)
+    if check_password_hash(usuario['password'], pasw.currentPasw):
+        hash = generate_password_hash(pasw.newPasw, method=settings.HASH)
+        await update_one('usuarios', {'username': user.username}, {'$set': {'password': hash}})
+        return {'msg': 'success'}
+    response.status_code = status.HTTP_400_BAD_REQUEST
+    return {'msg': 'Contraseña incorrecta, intente de nuevo'}
+
+@Login.get('/logout')
+async def logout(response: Response, user=Depends(manager)):
+    response.delete_cookie(settings.KEY_TOKEN)
+    return RedirectResponse('/login')

@@ -63,7 +63,7 @@
                   {% for pedido in pedidos %}
                     <tr>
                       <td>{{pedido.pedido.codDetalle}}</td>
-                      <td>{{pedido.cliente.nombre}} {{pedido.cliente.apellido}}</td>
+                      <td><a href="/clientes/clientes?id={{pedido.cliente._id['$oid']}}" target="_blank" rel="noopener noreferrer">{{pedido.cliente.nombre}} {{pedido.cliente.apellido}}</a></td>
                       <td>{{pedido.producto.descripcion}}</td>
                       <td>{{pedido.pedido.cantidad}}</td>
                       <td>{{pedido.pedido.presupuesto}}</td>

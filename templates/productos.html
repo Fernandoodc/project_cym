@@ -34,9 +34,6 @@
                       </div>
                   </div>
               </div>
-                <div class="col-sm-12 mt-3">
-                    <a name="nuevoProducto" id="nuevoProducto" class="btn btn-primary" href="/productos/nuevo_producto" role="button">Nuevo Producto</a>
-                </div>
             <div class="table-responsive-sm mt-3">
               <table class="table table-hover display" id="listaProductos">
                 <thead>
@@ -73,7 +70,6 @@
   {% block scripts %}
   <!-- Template Main JS File -->
   <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
   <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
   <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
   <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>

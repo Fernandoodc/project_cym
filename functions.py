@@ -5,10 +5,10 @@ from jose import jwt, JWTError
 from config import settings
 from models import tokenUser
 from datetime import datetime, timedelta
-from mongo import agreggate, update_one, find, filter, find_one, delete_one
+from mongo import agreggate, update_one, find, filter, find_one, delete_one, delete_many
 from bson import ObjectId, json_util
 from pymongo import MongoClient, ReturnDocument
-client = MongoClient(settings.MONGODB_SERVER)
+client = MongoClient(settings.MONGODB_URI)
 db = client[settings.MONGODB_DB]
 class Login():
     def get_user(self, username: str, codTipoUsuario: int):
@@ -58,7 +58,7 @@ class Usuarios():
     :return: None or one HTTPException(code 403)
     """
     def controlAcceso(self, typeRequired, user):
-        if(not user['codTipoUsuario'] in typeRequired):
+        if(not user.codTipoUsuario in typeRequired):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="No tienes los credenciales necesarios",
@@ -210,56 +210,6 @@ class Trabajos():
     
 
     def infoProduccion(self, codDetalle: str):
-        '''condition = [
-            {"$match": {
-                #"_id":  ObjectId(detallePedidos_id)
-                "codDetalle": codDetalle
-                }
-            },
-            {
-                "$lookup":{
-                    "from": "productos",
-                    "localField": "detalleProducto.codProducto",
-                    "foreignField": "codProducto",
-                    "as": "producto"
-                }
-            },
-            {
-                "$unwind": "$producto"
-            },
-            {
-                "$lookup":{
-                    "from": "produccion",
-                    "localField": "_id",
-                    "foreignField": "detallesPedidos_id",
-                    "as": "produccion"
-                }
-            },
-            {
-                "$unwind": "$produccion"
-            },
-            {
-                "$project":{
-                    "codProduccion": "$produccion.codProduccion",
-                    "codPedido": "$codPedido",
-                    "codDetalle": "$codDetalle",
-                    "producto": "$producto.descripcion",
-                    "cantidadRestante": "$produccion.cantidadRestante",
-                    "cantidad": "$cantidad",
-                    "descripcion": "$descripcion",
-                    "fechaEntrega": "$fechaEntrega",
-                    "etapa":{
-                        "codEtapa": "$produccion.etapa.codEtapa",
-                        "descripcion": "$produccion.etapa.descripcion"
-                    },
-                    "archivos": "$archivos",
-                    "diseños": "$produccion.diseños",
-                    "aprovado": "$produccion.aprovado",
-                    "detalleProducto": "$detalleProducto"
-                }
-            }
-        ]
-        data = agreggate("detallesPedidos", condition)'''
         condition = [
             {"$match": {
                 #"_id":  ObjectId(detallePedidos_id)
@@ -276,6 +226,28 @@ class Trabajos():
             },
             {
                 "$unwind": "$detallePedido"
+            },
+            {
+                "$lookup":{
+                    "from": "pedidos",
+                    "localField": "detallePedido.codPedido",
+                    "foreignField": "codPedido",
+                    "as": "infoPedido"
+                }
+            },
+            {
+                "$unwind": "$infoPedido"
+            },
+            {
+                "$lookup":{
+                    "from": "clientes",
+                    "localField": "infoPedido.cliente_id",
+                    "foreignField": "_id",
+                    "as": "cliente"
+                }
+            },
+            {
+                "$unwind": "$cliente"
             },
             {
                 "$lookup":{
@@ -305,7 +277,12 @@ class Trabajos():
                     "archivos": "$detallePedido.archivos",
                     "diseños": "$diseños",
                     "aprovado": "$aprovado",
-                    "detalleProducto": "$detallePedido.detalleProducto"
+                    "detalleProducto": "$detallePedido.detalleProducto",
+                    "cliente": {
+                        "cliente_id": '$cliente._id',
+                        "nombre": "$cliente.nombre",
+                        "apellido": "$cliente.apellido",
+                    }
                 }
             }
         ]
@@ -762,35 +739,75 @@ class Pedidos():
         #print(json_util._json_convert(response))
         return response
 
-    def actPresupuesto(self, codPedido):
-        presupuestoAct = self.sumPresupuesto(codPedido)['presupuesto']
-        db['pedidos'].update_one({'codPedido': codPedido}, {'$set':{'presupuesto': presupuestoAct}})
+    async def eliminarPedido(self, codPedido:str):
+        info = json_util._json_convert(db['pedidos'].find_one({'codPedido': codPedido}))
+        db['clientes'].update_one({'_id': ObjectId(info['cliente_id']['$oid'])}, {"$inc": {'saldo': -info['presupuesto']}})
+        """if info['infoDelivery']['solicitado'] == True:
+            db['clientes'].update_one({'_id': ObjectId(info['cliente_id']['$oid'])}, {"$inc": {'saldo': -info['infoDelivery']['costoDelivery']}})"""
+        await delete_one('pedidos', {'codPedido': codPedido })
+        await delete_one('cuentas', {'codPedido': codPedido })
+        await delete_many('detallesPedidos', {'codPedido': codPedido})
+    def actPresupuesto(self, codPedido:str):
+        presupuestoAct = self.sumPresupuesto(codPedido)
+        aux = False
+        if not 'presupuesto' in presupuestoAct:
+            presupuestoAct = {
+                "subTotal": 0,
+                "descuento": 0,
+                "presupuesto": 0
+            }
+            #bandera que informa que se elimino el ultimo detalle del pedido
+            aux = True
+        db['pedidos'].update_one({'codPedido': codPedido}, {'$set':presupuestoAct})
+        presupuestoAct = presupuestoAct['presupuesto']
         inforDelivery= self.infoPedido(codPedido)['infoDelivery']
-        if inforDelivery['solicitado'] == True:
-            db['pedidos'].update_one({'codPedido': codPedido}, {'$inc':{'presupuesto': inforDelivery['costoDelivery']}})
-            presupuestoAct = presupuestoAct + inforDelivery['costoDelivery']
+        if aux == False:
+            if inforDelivery['solicitado'] == True:
+                db['pedidos'].update_one({'codPedido': codPedido}, {'$inc':{'presupuesto': inforDelivery['costoDelivery']}})
+                presupuestoAct = presupuestoAct + inforDelivery['costoDelivery']
         db['cuentas'].find_one_and_update({'codPedido': codPedido}, {'$set':{'total': presupuestoAct}}, return_document=ReturnDocument.AFTER)
         cuentas = db['cuentas'].find_one({'codPedido': codPedido})
         db["clientes"].update_one({'_id': ObjectId(cuentas['cliente_id'])}, {'$inc':{'saldo': -cuentas['saldo']}})
         monto = 0
+        vuelto = 0
         response = 0
         if 'pagos'in cuentas:
             for pago in cuentas['pagos']:
                 monto = monto + pago['monto']
             seq = db['seq'].find_one_and_update({"cod": 2}, {"$inc":{"seq": 1}}, upsert=True , return_document=ReturnDocument.AFTER)
             numRecibo = '0'*(settings.NUM_RECIBO - len(str(seq['seq']))) + str(seq["seq"])
-            datos = {
-                    "fecha" : datetime.now().strftime("%y-%m-%d"),
-                    "monto": monto,
-                    "saldo": presupuestoAct-monto,
-                    "numeroRecibo": numRecibo
-                }
-            db['cuentas'].update_one({'codPedido': codPedido}, {"$set":{'pagos': [datos]}})
+            if monto > presupuestoAct:
+                if aux == True:
+                    db['cuentas'].update_one({'codPedido': codPedido}, { '$unset': { 'pagos': "" }})
+                else:
+                    datos = {
+                        "fecha" : datetime.now().strftime("%y-%m-%d"),
+                        "monto": presupuestoAct,
+                        "saldo": 0,
+                        "numeroRecibo": numRecibo
+                    }
+                    db['cuentas'].update_one({'codPedido': codPedido}, {"$set":{'pagos': [datos]}})
+            else:
+                datos = {
+                        "fecha" : datetime.now().strftime("%y-%m-%d"),
+                        "monto": monto,
+                        "saldo": presupuestoAct-monto,
+                        "numeroRecibo": numRecibo
+                    }
+                db['cuentas'].update_one({'codPedido': codPedido}, {"$set":{'pagos': [datos]}})
             response = numRecibo
-        db['cuentas'].update_one({'codPedido': codPedido}, {"$set":{"saldo": (presupuestoAct-monto)}})
-        db["clientes"].update_one({'_id': ObjectId(cuentas['cliente_id'])}, {'$inc':{'saldo': (presupuestoAct-monto)}})
-
-        return response
+        if (presupuestoAct- monto) <= 0:
+            vuelto = monto - presupuestoAct
+            saldo = 0
+            db['cuentas'].update_one({'codPedido': codPedido}, {"$set":{"saldo": 0}})
+            db["clientes"].update_one({'_id': ObjectId(cuentas['cliente_id'])}, {'$inc':{'saldo': 0}})
+        else:
+            saldo = presupuestoAct - monto
+            db['cuentas'].update_one({'codPedido': codPedido}, {"$set":{"saldo": (presupuestoAct-monto)}})
+            db["clientes"].update_one({'_id': ObjectId(cuentas['cliente_id'])}, {'$inc':{'saldo': (presupuestoAct-monto)}})
+        return {'numeroRecibo': response,
+        'saldo': saldo,
+        'vuelto': vuelto}
 
     #informa si todos los detalles de un pedidos ya fueron entregados
     #return = bool
@@ -899,6 +916,7 @@ class Insumos():
             ]
         response = agreggate('insumosPerdidos', condicion)
         return response
+
     
 insumos = Insumos()
 
@@ -932,6 +950,57 @@ class Productos():
         ]
         response = db['productos'].aggregate(condicion)
         return response
+    '''
+    Comtrol para saber si no hay ninguna producción sin terminar o pedido sin entregar relacionado a este productos
+    Para saber si se puede proceder a eliminar el productos
+    :return: bool
+    true = se puede eliminar ; false = no se puede eliminar
+    '''
+    def controlDelete(self, CodProducto:str):
+        condition = [
+            {
+                '$match':{'detalleProducto.codProducto': CodProducto}
+            },
+            {
+                '$lookup':{
+                'from': 'productos',
+                'localField': 'detalleProducto.codProducto',
+                'foreignField': 'codProducto',
+                'as': 'producto'
+                }
+            },
+            {
+                '$unwind': '$producto'
+            },
+            {
+                '$lookup':{
+                'from': 'produccion',
+                'localField': '_id',
+                'foreignField': 'detallesPedidos_id',
+                'as': 'produccion'
+                }
+            },
+            {
+                '$unwind': '$produccion'
+            },
+            {
+                '$match': {
+                '$or': [{'entrega.entregado': False},
+                {'produccion.etapa.codEtapa': {'$ne': 2}}]
+                }
+            },
+            {
+                '$count': 'cantidad'
+            }
+        ]
+        cant = json_util._json_convert(db['detallesPedidos'].aggregate(condition))
+        for i in cant:
+            cant = i
+        if 'cantidad' in cant:
+            if cant['cantidad']>0:
+                return False
+        return True
+
 
 infoProductos = Productos()
 
@@ -1374,7 +1443,6 @@ class funcionesReportes():
                     }
                 })
             return db['insumosPerdidos'].aggregate(condition)
-
         def utilizados(self, fInicio:str='' , fFin:str=''):
             condition = [
                 {
@@ -1446,3 +1514,131 @@ class funcionesReportes():
                     }
                 })
             return db["detallesPedidos"].aggregate(condition)
+        def historialDet(self,  fInicio:str='' , fFin:str=''):
+            condition = [
+                {
+                    '$lookup': {
+                        'from': 'insumos',
+                        'localField': 'codInsumo',
+                        'foreignField': 'codInsumo',
+                        'as': 'insumo'
+                    }
+                },
+                {
+                    '$unwind': '$insumo'
+                },
+                {
+                    '$lookup':{
+                        'from': 'facturasProveedores',
+                        'localField': 'FacturasProveedores_id',
+                        'foreignField': '_id',
+                        'as': 'factura'
+                    }
+                },
+                {
+                    '$unwind': '$factura'
+                },
+                {
+                    '$lookup':{
+                        'from': 'proveedores',
+                        'localField': 'factura.Proveedores_id',
+                        'foreignField': '_id',
+                        'as': 'proveedor'
+                    }
+                },
+                {
+                    '$unwind': '$proveedor'
+                }
+            ]
+            if fInicio != '':
+                condition.append({
+                    '$match': {
+                        "factura.fecha": { "$gte": fInicio }
+                    }
+                })
+            if fFin != '':
+                condition.append({
+                    '$match':{
+                        "factura.fecha": { "$lte": fFin }
+                    }
+                })
+            return db['comprasInsumos'].aggregate(condition)
+
+class Auditorias():
+    def productos(self):
+        condition = [
+            {
+                '$lookup':{
+                    'from': 'usuarios',
+                    'localField': 'usuario',
+                    'foreignField': '_id',
+                    'as': 'infoUsuario'
+                }
+            },
+            {
+                '$unwind': '$infoUsuario'
+            }
+        ]
+        return db['auditoriaProductos'].aggregate(condition)
+    def pedidos(self):
+        condition = [
+            {
+                '$lookup':{
+                    'from': 'usuarios',
+                    'localField': 'usuario',
+                    'foreignField': '_id',
+                    'as': 'infoUsuario'
+                }
+            },
+            {
+                '$unwind': '$infoUsuario'
+            }
+        ]
+        return db['auditoriaPedidos'].aggregate(condition)
+    def insumos(self):
+        condition = [
+            {
+                '$lookup':{
+                    'from': 'usuarios',
+                    'localField': 'usuario',
+                    'foreignField': '_id',
+                    'as': 'infoUsuario'
+                }
+            },
+            {
+                '$unwind': '$infoUsuario'
+            }
+        ]
+        return db['auditoriaInsumos'].aggregate(condition)
+    def detallesPedidos(self):
+        condition = [
+            {
+                '$lookup':{
+                    'from': 'usuarios',
+                    'localField': 'usuario',
+                    'foreignField': '_id',
+                    'as': 'infoUsuario'
+                }
+            },
+            {
+                '$unwind': '$infoUsuario'
+            }
+        ]
+        return db['auditoriaDetallesPedidos'].aggregate(condition)
+    def proveedores(self):
+        condition = [
+            {
+                '$lookup':{
+                    'from': 'usuarios',
+                    'localField': 'usuario',
+                    'foreignField': '_id',
+                    'as': 'infoUsuario'
+                }
+            },
+            {
+                '$unwind': '$infoUsuario'
+            }
+        ]
+        return db['auditoriaProveedores'].aggregate(condition)
+        
+

@@ -553,3 +553,33 @@ function toDataUrl(url, callback) {
   xhr.responseType = 'blob';
   xhr.send();
 }
+
+function date(format=2){
+  var f = new Date() 
+  var year = f.getFullYear()
+  var month = f.getMonth()+1
+  var hour = f.getHours()
+  if(f.getDate()<10){
+    day = "0"+f.getDate()
+  }
+  else{
+    day = f.getDate()
+  
+  }
+  if(hour<10){
+    hour = '0'+hour
+  }
+  if(f.getMinutes()<10){
+    min = "0"+f.getMinutes();
+  }
+  else{
+    min = f.getMinutes();
+  }
+  if(month<10){
+    month = "0"+month
+  }
+  if (format == 1){
+    return(year+"-"+month+"-"+day)
+  }
+  return(year+"-"+month+"-"+day +"T"+hour+":"+min)
+}

@@ -1,10 +1,58 @@
+CODINSUMO = ''
 $(document).ready(function(){
     if($('#motivo :selected').val() == 'other'){
         $('.otherMotivo').prop('hidden', false)
     }else{
         $('.otherMotivo').prop('hidden', true)
     }
+    $('#newFechaFactura').attr({
+        'max': date(1),
+        'value': date(1)
+    });
 })
+
+async function infoInsumo(codInsumo){
+    $('.infoInsumo').prop('disabled', true)
+    $('#guardarCambios-btn').hide();
+    $('#editar-btn').show()
+    $('#infoInsumo-modal').modal('show')
+    $('.required').hide();
+    var datos = await tipoInsumo(codInsumo)
+    CODINSUMO = datos.codInsumo
+    $('#codInsumo').val(datos.codInsumo);
+    $('#tipoInsumo').val(datos.tipoInsumo_id).change();
+    $('#descInsumo').val(datos.descripcion);
+    $('#stockMin').val(datos.stockMin);
+}
+
+$('#editar-btn').click(function (e) { 
+    e.preventDefault();
+    $('.infoInsumo').prop('disabled', false)
+    $('#guardarCambios-btn').show();
+    $('.required').show();
+    $(this).hide()
+});
+$('#editInsumo-form').submit(async function (e) { 
+    e.preventDefault();
+    if($('#stockMin').val()<0){
+        $('#stockMin').focus()
+        return 0
+    }
+    $(this).prop('disabled', true)
+    var datos = {
+        stockMin: $('#stockMin').val(),
+        descripcion: $('#descInsumo').val()
+    }
+    await editarInsumo(datos, CODINSUMO)
+    infoInsumo(CODINSUMO)
+});
+
+$('#eliminar-btn').click(async function (e) { 
+    e.preventDefault();
+    $('#eliminar-btn').prop('disabled', true)
+    await eliminarInsumo(CODINSUMO)
+    location.reload()
+});
 
 function actFecha(){
     if($('#facturas').prop('selectedIndex') > -1){
@@ -16,6 +64,20 @@ function actFecha(){
     }
 
     
+}
+async function infoProveedor(ruc){
+    $('.infoProveedor').prop('disabled', true)
+    $('#editarProveedor').show(),
+    $('#guardarProveedor').hide()
+    $('.required').hide()
+    var datos = await datosProveedor(ruc)
+    console.log(datos)
+    $('#nombreProveedor').val(datos.nombre);
+    $('#rucProveedor').val(datos._id);
+    $('#direccionProveedor').val(datos.direccion);
+    $('#celularProveedor').val(datos.celular);
+    $('#emailProveedor').val(datos.email);
+    $('#infoProveedor-modal').modal('show')
 }
 $('#aggProveedor').click(async function(){
     if($('#rucProveedor').val() == ''){
@@ -66,6 +128,38 @@ const actListaFacturas = async () => {
     }
     actFecha()
 }
+
+$('#editarProveedor').click(function (e) { 
+    e.preventDefault();
+    $('#editarProveedor').hide()
+    $('#guardarProveedor').show()
+    $('.required').show()
+    $('.infoProveedor').prop('disabled', false)
+});
+
+$('#infoProveedor-form').submit(async function (e) { 
+    e.preventDefault();
+    var datos = {
+        nombre : $('#nombreProveedor').val(),
+        ruc: $('#rucProveedor').val(),
+        direccion: $('#direccionProveedor').val(),
+        celular: $('#celularProveedor').val(),
+        email: $('#emailProveedor').val(),
+    }
+    console.log(datos)
+    await updateProveedor(datos)
+    $('.infoProveedor').prop('disabled', true)
+    $('#editarProveedor').show(),
+    $('#guardarProveedor').hide()
+    $('#'+datos.ruc + ' .ruc').text(datos.ruc)
+    $('#'+datos.ruc + ' .nombre').text(datos.nombre)
+    $('#'+datos.ruc + ' .direccion').text(datos.direccion)
+    $('#'+datos.ruc + ' .celular').text(datos.celular)
+    $('#'+datos.ruc + ' .email').text(datos.email)
+    $('.required').hide()
+
+});
+
 $('#newFactura').click(function(){
     $('#infoProveedor').val($("#proveedores :selected").text())
 
@@ -189,7 +283,7 @@ $("#agregar").click(async function(){
 
     cols = '<td>'+ datos.cantidad +'</td>'
     newRow.append(cols);
-     
+    
     var total = datos.precioUnitario * datos.cantidad
     cols = '<td id="total-'+ idCompra +'" >'+ total +'</td>'
     newRow.append(cols);
@@ -208,11 +302,10 @@ $('#limpiar').click(function(){
 })
 
 async function eliminarCompra(id){
-    if (await eliminarCompraAjax(id)){
-        var precio = parseInt($('#total-'+id).html())
-        $('#total').html(parseInt($('#total').html()) - precio)
-        $('#'+id).hide()
-    }
+    await eliminarCompraAjax(id)
+    var precio = parseInt($('#total-'+id).html())
+    $('#total').html(parseInt($('#total').html()) - precio)
+    $('#'+id).hide()
 
 }
 

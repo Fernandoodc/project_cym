@@ -8,10 +8,7 @@ from nlt import numlet as nl
 from bson import json_util, ObjectId
 from models import pagos, factura
 from pymongo import MongoClient, ReturnDocument
-import datetime
-import json
 from manager import	 manager
-from mongo import delete_one, delete_many, find_one, find, update_one, filter
 from functions import infoPedidos, trabajos
 from config import settings
 
@@ -22,14 +19,14 @@ from pdfkit import from_string
 
 from fastapi import Response, BackgroundTasks
 
-client = MongoClient(settings.MONGODB_SERVER)
+client = MongoClient(settings.MONGODB_URI)
 db = client[settings.MONGODB_DB]
 Pagos = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 @Pagos.get("/cobranza")
-async def Cobranza(request: Request, documento: str = '', user = Depends(manager)):
-    return templates.TemplateResponse('cobranza.html', context={'request': request, 'documento': documento, 'userInfo': user})
+async def Cobranza(request: Request, documento: str = '', codPedido:str='', user = Depends(manager)):
+    return templates.TemplateResponse('cobranza.html', context={'request': request, 'documento': documento, 'codPedido': codPedido, 'userInfo': user})
 
 @Pagos.post("/registrar_pago")
 async def registrarPago(response: Response, datos: pagos, user = Depends(manager)):
@@ -64,6 +61,7 @@ async def registrarPago(response: Response, datos: pagos, user = Depends(manager
     pago = db['cuentas'].find_one_and_update({'codPedido': datos.codPedido, 'cliente_id': ObjectId(datos.cliente_id)}, upd, upsert=True, return_document=ReturnDocument.AFTER)
     db['clientes'].update_one({'_id': ObjectId(datos.cliente_id)}, {'$inc': {'saldo': -datos.monto}})
     return {"saldo": pago['saldo'],
+            "total": pago['total'],
             "numeroRecibo": numRecibo
             }
 
@@ -158,7 +156,6 @@ def imprimirRecibo(request: Request, background_tasks: BackgroundTasks, num:str,
         #'orientation': 'Landscape'
         
     }
-
     env = Environment(loader=FileSystemLoader('templates'))
     template = env.get_template('base_factura.html')
     html_out = template.render(datosFactura, cliente = infoCliente)

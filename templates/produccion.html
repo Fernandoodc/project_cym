@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Inicios{% endblock %}
+{% block title %}Producción{% endblock %}
 
 {% block content %}
 
@@ -97,7 +97,7 @@
                         <tbody id="infoArchivos">
                           {% for archivo in producto.archivos %}
                               <tr class="">
-                                  <td scope="row"><a href="/files?ruta={{archivo.ruta}}" >{{archivo.nombre}}</a></td>
+                                  <td scope="row"><a href="/files?ruta={{archivo.ruta}}" target="_blank" >{{archivo.nombre}}</a></td>
                                   <td><a class="btn btn-primary" href="/files/download?ruta={{archivo.ruta}}&filename={{archivo.nombre}}" role="button">Descargar</a></td>
                               </tr>
                           {% endfor %}
@@ -120,7 +120,7 @@
                         <tbody id="infoDisenios">
                           {% for diseño in producto.diseños %}
                             <tr class="">
-                                <td scope="row"><a href="/files?ruta={{diseño.ruta}}" >{{diseño.descripcion}}</a></td>
+                                <td scope="row"><a href="/files?ruta={{diseño.ruta}}" target="_blank">{{diseño.descripcion}}</a></td>
                                 <td><a class="btn btn-primary" href="/files/download?ruta={{diseño.ruta}}&filename={{diseño.descripcion}}" role="button">Descargar</a></td>
                             </tr>
                           {% endfor %}
@@ -207,7 +207,7 @@
                     <div id="newCliente">
                           <div class="alert" id="alertPedida"></div>
                           <div class="row mb-3">
-                            <label for="insumos" class="col-sm-2 col-form-label">Insumo:</label>
+                            <label for="insumos" class="col-sm-2 col-form-label">Insumo<span class="text-danger">*</span></label>
                             <div class="col-sm-10">
                               <select class="form-select form-select-sm" name="insumo" id="insumo">
                                 {% for insumo in producto.insumos %}
@@ -219,13 +219,13 @@
                             </div>
                           </div>
                           <div class="row mb-3">
-                            <label for="cantidadPerdidad" class="col-sm-2 col-form-label">Cantidad:</label>
+                            <label for="cantidadPerdidad" class="col-sm-2 col-form-label">Cantidad<span class="text-danger">*</span></label>
                             <div class="col-sm-10">
                               <input type="number" name="cantidadPerdidad" id="cantidadPerdidad" class="form-control">
                             </div>
                           </div>
                           <div class="row mb-3">
-                            <label for="comentarios" class="col-form-label col-sm-2">Comentarios</label>
+                            <label for="comentarios" class="col-form-label col-sm-2">Comentarios<span class="text-danger">*</span></label>
                             <div class="col-sm-10">
                               <textarea name="comentarios" id="comentarios" class="form-control"></textarea>
                             </div>
@@ -248,7 +248,7 @@
                   <th scope="col">Cant.</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="listPerdidos">
                 {% for perdido in insumosPerdidos %}
                 <tr>
                   <td>{{perdido.insumo.descripcion}}</td>

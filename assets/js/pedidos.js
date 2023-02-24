@@ -32,35 +32,7 @@ function init(){
   $('#divDireccion').hide()
 }
 
-function date(format=2){
-  var f = new Date() 
-  var year = f.getFullYear()
-  var month = f.getMonth()+1
-  var hour = f.getHours()
-  if(f.getDate()<10){
-    day = "0"+f.getDate()
-  }
-  else{
-    day = f.getDate()
-  
-  }
-  if(hour<10){
-    hour = '0'+hour
-  }
-  if(f.getMinutes()<10){
-    min = "0"+f.getMinutes();
-  }
-  else{
-    min = f.getMinutes();
-  }
-  if(month<10){
-    month = "0"+month
-  }
-  if (format == 1){
-    return(year+"-"+month+"-"+day)
-  }
-  return(year+"-"+month+"-"+day +"T"+hour+":"+min)
-}
+
 
 async function get_client(){
   id_cliente = null
@@ -79,8 +51,6 @@ async function get_client(){
 const prodSelected = () => {
     let indice = $('#listaProductos').prop('selectedIndex')
     if(indice === -1) return;
-    console.log(indice)
-    console.log(productos[indice])
     //variaciones = productos[indice].variaciones
     pMayoristas = productos[indice].preciosMayoristas
 
@@ -96,7 +66,6 @@ const prodSelected = () => {
         }
       }
 	  }
-    console.log(pMayoristas)
 
     //select_var.innerHTML=""
     //console.log(variaciones.length)
@@ -110,16 +79,13 @@ const prodSelected = () => {
     codMetodo = productos[indice].metodoCalculo.codMetodo
     precioBase = productos[indice].precioBase
     if(codMetodo == 1){
-      console.log('Precio Absoluto')
       div_calculo.innerHTML = ""
     }
     else if(codMetodo == 2){
-      console.log('Calculo por cm2')
       div_calculo.setAttribute("class", "row mb-3")
       div_calculo.innerHTML = '<label class="col-sm-2 col-form-label">Dimensiones cm2</label><div class="col-sm-5"><label for="inputText" class="col-sm-3 col-form-label">Ancho</label> <input type="number" class="form-control" id="ancho"></div><div class="col-sm-4"><label for="inputText" class="col-sm-3 col-form-label">Alto</label> <input type="number" class="form-control" id="alto"> </div>'
     }
     else if(codMetodo == 3){
-      console.log('Calculo por cm2')
       div_calculo.setAttribute("class", "row mb-3")
       div_calculo.innerHTML = '<label class="col-sm-2 col-form-label">Dimensiones m2</label><div class="col-sm-5"><label for="inputText" class="col-sm-3 col-form-label">Ancho</label> <input type="number" class="form-control" id="ancho"></div><div class="col-sm-4"><label for="inputText" class="col-sm-3 col-form-label">Alto</label> <input type="number" class="form-control" id="alto"> </div>'
     }
@@ -146,8 +112,6 @@ const actPresup = () => {
   //console.log(deliv)*/
   
   for(i=0; i<pMayoristas.length; i++){
-    console.log(pMayoristas[i].cantidad)
-    console.log(cant)
     if(cant>=pMayoristas[i].cantidad){
 
       pMayorista = pMayoristas[i].precio
@@ -233,9 +197,7 @@ const agregar = async () => {
         dataPedido.delivery.solicitado = true
         dataPedido.delivery.direccion = $('#direccion').val()
       }
-      console.log(dataPedido)
       codPedido = await create_pedido(dataPedido)
-      console.log(codPedido)
       if(codPedido == 0){
         console.log("Error al Crear el Pedido");
         return 0;
@@ -278,15 +240,12 @@ const agregar = async () => {
     if (detalle.senaRequerida == true){
       $('#help').html('Se requiere de una seña del 50% como minimo para pasar los pedidos a producción')
     }
-    console.log(detPedido);
     if(document.getElementById("archivos").value != ''){
       let form = document.getElementById("aggPedido")
       let data = new FormData(form);
-      console.log(data)
       data.append("cod_pedido", codPedido);    
       data.append("cod_detalle", detalle.codDetalle);
       files = await uploadFiles(data);
-      console.log(files)
     }else
       files = []
     
@@ -301,7 +260,8 @@ const agregar = async () => {
     $("#agregar").prop("disabled", false);
     $("#documento").prop("disabled", true);
     $('#buscar').hide()
-    $('#newCliente').hide()
+    $('#nuevoCliente').hide()
+    $('#newCliente-modal').remove();
     $('#divDocumento').addClass('col-sm-10')
     $('#descripcion').val('')
     $('#cantidad').val('')
@@ -354,14 +314,8 @@ const agregarCliente = () =>{
     data: JSON.stringify(data),
     contentType: "application/json",
     dataType: 'json',
-    success: function(result, textStatus, xhr) { 
-        console.log(result)
-        //document.getElementById("newCliente").reset()
-
-    },
     success: function(xhr, textStatus) {
       console.log("success - "+textStatus)
-      console.log(data.documento)
       $('#documento').val(data.documento);
       $('#alertNuevoCliente').html('')
       $('#newCliente-modal').modal('hide');
@@ -392,10 +346,11 @@ const agregarCliente = () =>{
   $('#divDireccion').hide()
 })/*/
 
-$('#terminar').click(function(){
+$('#terminar').click(async function(){
   if(BANDPRINT == false){
     $('#imprimirRecibo').hide()
     $('#imprimirFactura').hide()
+    await abonar(CODPEDIDO)
   }
 
   $('#monto').attr({
@@ -436,8 +391,9 @@ async function infoPedido(codDetalle){
   CODDETALLE = detalle.codDetalle
   CODPEDIDO = detalle.codPedido
   id_cliente = detalle.cliente._id['$oid']
-  console.log(detalle)
-
+  $('#presuTotal').text(detalle.pedido.presupuesto);
+  $('#presuIndi').text(detalle.presupuesto);
+  $('#abonado').text(detalle.estadoCuenta.total - detalle.estadoCuenta.saldo    );
   if(detalle.produccionPedido.produccionTerminada == true)
     $('.entregar-btn').show()
   else
@@ -474,9 +430,7 @@ async function infoPedido(codDetalle){
   if(detalle.estadoCuenta.saldo <= 0)
     $('.abonar-btn').prop('hidden', true)
   if(detalle.archivos != undefined){
-    console.log('i')
     for(i in detalle.archivos){
-        console.log(detalle.archivos[i].ruta)
         var newRow = $("<tr>");
         var cols = "";
         cols += '<td><a href="/files?ruta='+ detalle.archivos[i].ruta +'" target="_blank"> '+ detalle.archivos[i].nombre +"</a></td>";
@@ -494,14 +448,10 @@ $('#aggArchivo').click(async function(){
     let archivos = new FormData(form);
     archivos.append("cod_pedido", CODPEDIDO);    
     archivos.append("cod_detalle", CODDETALLE);
-    console.log(archivos.get("cod_pedido"))
-    console.log(archivos.get("cod_detalle"))
-    console.log(archivos.get("files"))
     $("#aggArchivo").prop("disabled", true)
     files = await uploadFiles(archivos);
     $("#aggArchivo").prop("disabled", false)
     for(i in files){
-        console.log(files[i])
         var newRow = $("<tr>");
         var cols = "";
         cols += '<td><a href="/files?ruta='+ files[i].ruta +'" target="_blank"> '  +files[i].nombre+"</a></td>";
@@ -541,7 +491,7 @@ $('#direccion').on('input',function(){
   change()
 });
 
-$('#saveChange-btn').click(function(){
+$('#saveChange-btn').click(async function(){
   if(CODPEDIDO == null)
     return 0
   FECHAENTREGA = $('#fecha_entrega').val()
@@ -563,7 +513,10 @@ $('#saveChange-btn').click(function(){
   if( datos.delivery.solicitado != true ){
     datos.delivery.direccion = ''
   }
-  actInfoPedido(CODPEDIDO, datos)
+  var result = await actInfoPedido(CODPEDIDO, datos)
+  console.log(result)
+  $('#total, .total').text(result.presupuesto);
+  $('#saldo').text(result.saldo);
 })
 
 $('#btnGuardar').click(async function(){
@@ -618,10 +571,23 @@ $('#entregarPedido-btn').click( async function(){
 $('#abonarPedido-btn').click(async function(){
   $('#abonar-div').prop('hidden', false)
   $('#detallesPedido-div').prop('hidden', true)
-  $('#btnEditar').prop('hidden', true)
+  $('#btnEditar').hide()
   $('#btnGuardar').prop('hidden', true)
   await abonar(CODPEDIDO)
 })
+
+$('#eliminar-btn').click(function (e) { 
+  e.preventDefault();
+  $('.modal').modal('hide')
+  $('#eliminarDet-modal').modal('show')
+  $('.consulta').show();
+  $('.printFactura, .vuelto, .cerrarModal').hide();
+});
+
+$('#eliminarDetalle').click(function (e) { 
+  e.preventDefault();
+  eliminarDet(CODDETALLE)
+});
 
 init()
 prodSelected()

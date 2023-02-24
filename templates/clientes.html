@@ -10,7 +10,7 @@
   <nav>
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-      <li class="breadcrumb-item active">Cliente</li>
+      <li class="breadcrumb-item active">Clientes</li>
     </ol>
   </nav>
 </div><!-- End Page Title -->
@@ -78,9 +78,9 @@
                                 <label for="inputText" class="col-sm-2 col-form-label">Nacionalidad</label>
                                 <div class="col-sm-10">
                                     <select class="form-select infoCliente" id="nacionalidad" aria-label="Default select example" disabled>
-                                      <option selected value="PY">Paraguaya</option>
-                                      <option value="AR">Argentina</option>
-                                      <option value="BR">Brasilera</option>
+                                      {% for nacionalidad in nacionalidades %}
+                                        <option value="{{nacionalidad._id}}">{{nacionalidad.descripcion}}</option>
+                                      {% endfor %}
                                     </select>
                                   </div>
                             </div>
@@ -120,7 +120,7 @@
                               </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                 <button type="button" class="btn btn-primary" id="editar-cliente">Editar</button>
                                 <button type="button" class="btn btn-success" id="guardar" >Guardar</button>
                               </div>
@@ -141,7 +141,6 @@
 {% block scripts %}
   <!-- Template Main JS File -->
   <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/main.js') }}"></script>
   <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
   <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
   <script src="{{ url_for('static', path='/js/clientes.js') }}"></script>
@@ -153,6 +152,14 @@
          });
     });
     </script>
+    {% if id %}
+      <script>
+        datosCliente({{id | tojson}})
+        $('#infoCliente-modal').on("hidden.bs.modal",function(){
+          window.close()
+        })
+      </script>
+    {% endif %}
 {% endblock %}
 </body>
 

@@ -187,25 +187,9 @@ $('#guardarTypeUser-btn').click(async function (e) {
     })
 });
 
-$('#reNewPasw, #newPasw').keyup(function (e) { 
-    setTimeout(() => {
-        if($('#reNewPasw').val() == ''){
-            $('.newPasw').css('border-color', '');
-            $('#alertnewPasw').prop('hidden', true)
-            return 0
-        }
-        verificarPaswEq()
-    }, 1000);
-});
-$('#newPasw').keyup(function (e) { 
-    setTimeout(() => {
-        verificarPaswLen()
-    }, 500);
-});
-
 $('#changePasw-btn').click(async function (e) { 
     e.preventDefault();
-    if(verificarPaswLen == false || verificarPaswEq() == false){
+    if(verificarPaswLen() == false || verificarPaswEq() == false){
         return 0
     }
     $(this).prop('disabled', true)
@@ -260,8 +244,8 @@ $('#form-newUSer').submit(async function (e) {
         contentType: "application/json",
         dataType: 'json',
         success: function(result, textStatus, xhr){
-            $('#newUser-ok').prop('hidden', false)
-            location.reload
+            $('#newUser-ok').prop('hidden', true)
+            location.reload()
         },
         complete: function(xhr, textStatus){
             $('#form-newUSer').prop('disabled', true)

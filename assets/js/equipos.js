@@ -1,22 +1,28 @@
 IDEQUIPO = null
 $(document).ready(function(){
-    var marcar = $('#marca :selected')
-    if(marcar.val() == 'other')
-        $('.otherMarca').prop('hidden', false)
-    else
-        $('.otherMarca').prop('hidden', true)
-        
     var tipo = $('#tipoEquipo :selected')
-    if(tipo.val() == 'other')
+    if(tipo.val() == 'other'){
         $('.otherTipo').prop('hidden', false)
+    }
     else
         $('.otherTipo').prop('hidden', true)
+    
+    var marcar = $('#marca :selected')
+    if(marcar.val() == 'other'){
+        $('.otherMarca').prop('hidden', false)
+        
+    }
+    else
+        $('.otherMarca').prop('hidden', true)  
+    
 
     var tipoTrabajo = $('#tipoTrabajo :selected')
-    if(tipoTrabajo.val() == 'other')
-        $('.otherTipo').prop('hidden', false)
+    if(tipoTrabajo.val() == 'other'){
+        $('.otherTipoTrab').prop('hidden', false)
+    }
     else
-        $('.otherTipo').prop('hidden', true)
+        $('.otherTipoTrab').prop('hidden', true)
+    $('#fechaMantenimiento, #fecha').attr('max', date(1));
 })
 
 async function infoEquipo(id){
@@ -77,6 +83,10 @@ $('#agregarEquipo-btn').click(async function(){
     }
     if(marca.val() == ''){
         marca.focus()
+        return 0
+    }
+    if(modelo.val() == ''){
+        modelo.focus()
         return 0
     }
     if(marca.val() == 'other' && otherMarca.val() == ''){
@@ -150,9 +160,9 @@ $('#agregarMantenimiento-btn').click(async function(){
 $('#tipoTrabajo').change(function(){
     var tipoTrabajo = $('#tipoTrabajo :selected')
     if(tipoTrabajo.val() == 'other')
-        $('.otherTipo').prop('hidden', false)
+        $('.otherTipoTrab').prop('hidden', false)
     else
-        $('.otherTipo').prop('hidden', true)
+        $('.otherTipoTrab').prop('hidden', true)
 })
 
 

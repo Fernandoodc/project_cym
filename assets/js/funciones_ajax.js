@@ -134,10 +134,33 @@ function eliminarDet(codDet){
         success: function(result, textStatus, xhr) { 
             console.log(result)
             document.getElementById(codDet).remove()
+            $('.total').text(result.presupuesto);
+            if(result.presupuesto <= 0){
+                $('#terminar').prop('disabled', true)
+            }
+            if(result.vuelto > 0){
+                $('.vuelto').show();
+                $('.vuelto span').text(result.vuelto)
+            }else{
+               $('.modal').modal('hide') 
+            }
+            /*if(result.saldo <= 0){
+                $('.printFactura').show();
+                $('.printFactura').attr('href', '/pagos/cobranza?codPedido='+CODPEDIDO);
+            }*/
+            $('.consulta').hide();
+            $('.cerrarModal').show();
 
         },
         complete: function(xhr, textStatus) {
-        } 
+        },
+        error: function(e){
+            console.log(e)
+            if(e.status == 409)
+                alert(e.responseJSON.msg)
+            else
+                alert(e.statusText)
+        }
     });
 }
 
@@ -157,17 +180,18 @@ async function eliminarPedido(codPedido){
     });
 }
 
-function actInfoPedido(codPedido, datos){
-    $.ajax({
+async function actInfoPedido(codPedido, datos){
+    var response
+    await $.ajax({
         type: "POST",
         url: "/pedidos/actualizar_info?"+$.param({'codPedido': codPedido}),
         data: JSON.stringify(datos),
         contentType: "application/json",
         dataType: 'json',
         success: function(result, textStatus, xhr) { 
-            console.log(result)
             $('#saveChange-btn').prop('hidden', true)
             $('.changeInfo').prop('hidden', true)
+            response = result
         },
         complete: function(xhr, textStatus){
         },
@@ -176,6 +200,7 @@ function actInfoPedido(codPedido, datos){
             alert(e.statusText)
         }
     });
+    return response
 }
 
 function get_products(){
@@ -645,6 +670,46 @@ async function tipoInsumo(codInsumo){
     });
 }
 
+async function editarInsumo(datos, codInsumo){
+    return await $.ajax({
+        type: "PUT",
+        url: "/insumos/editar_insumo?"+$.param({'codInsumo': codInsumo}),
+        data: JSON.stringify(datos),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function(result, textStatus, xhr) { 
+            return result
+        },
+        complete: function(xhr, textStatus){
+            $('#guardarCambios-btn').prop('disabled', false)
+        },
+        error: function(e){
+            console.log(e)
+            alert(e.statusText)
+        }
+    });
+}
+
+async function eliminarInsumo(codInsumo){
+    return await $.ajax({
+        type: "DELETE",
+        url: "/insumos/eliminar_insumo?"+$.param({'codInsumo': codInsumo}),
+        success: function(result, textStatus, xhr) { 
+            return result
+        },
+        complete: function(xhr, textStatus){
+            $('#eliminar-btn').prop('disabled', false)
+        },
+        error: function(e){
+            console.log(e)
+            if(e.status == 409)
+                alert(e.responseJSON.msg)
+            else
+                alert(e.statusText)
+        }
+    });
+}
+
 async function bajaInsumo(datos){
     await $.ajax({
         type: "POST",
@@ -714,13 +779,17 @@ async function eliminarProductoAjax(codProducto){
         type: "POST",
         url: "/productos/eliminar_producto?"+ $.param({"codProducto": codProducto}),
         success: function(result, textStatus, xhr) { 
+            location.reload()
         },
         complete: function(xhr, textStatus){
             $('#eliminarProducto-btn').prop('disabled', false)
         },
         error: function(e){
             console.log(e)
-            alert(e.statusText)
+            if(e.status == 409){
+                alert(e.responseJSON.msg)
+            }else
+                alert(e.statusText)
         }
     });
 }
@@ -800,6 +869,65 @@ async function eliminarEquipoAjax(id){
         error: function(e){
             console.log(e)
             alert(e.statusText)
+        }
+    });
+}
+async function datosProveedor(ruc){
+    return await $.ajax({
+        type: "GET",
+        url: "/proveedores/proveedor?"+ $.param({"ruc": ruc}),
+        success: function(result, textStatus, xhr) { 
+            return result
+        },
+        complete: function(xhr, textStatus){
+        },
+        error: function(e){
+            console.log(e)
+            alert(e.statusText)
+        }
+    });
+}
+
+async function updateProveedor(datos){
+    $('#guardarProveedor').prop('disabled', true)
+    return $.ajax({
+        type: "POST",
+        url: "/proveedores/proveedor/editar",
+        data: JSON.stringify(datos),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function(result, textStatus, xhr) { 
+            return result
+        },
+        complete: function(xhr, textStatus){
+            $('#guardarProveedor').prop('disabled', false)
+        },
+        error: function(e){
+            console.log(e)
+            alert(e.statusText)
+        }
+    });
+}
+
+async function changePassword(datos){
+    $('#alertPassword').prop('hidden', true)
+    return await $.ajax({
+        type: "PUT",
+        url: "/update_passw",
+        data: JSON.stringify(datos),
+        contentType: "application/json",
+        dataType: 'json',
+        success: function(result, textStatus, xhr) { 
+            return result
+        },
+        complete: function(xhr, textStatus){
+        },
+        error: function(e){
+            console.log(e)
+            if(e.status == 400){
+                $('#alertPassword').prop('hidden', false)
+            }else
+                alert(e.statusText)
         }
     });
 }

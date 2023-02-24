@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from models import aprovacion, datosProduccion, perdida
 from json import loads
 from functions import trabajos, insumos
+from config import settings
 Trabajos = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
@@ -32,7 +33,7 @@ async def estadoProduccion(response: Response, codPedido: str,  user=Depends(man
     return data
 
 @Trabajos.post("/upload_disenio")
-async def uploadDisenio(response : Response ,files: List[UploadFile] = File(...), cod_pedido: str = Form(...), cod_detalle: str = Form(...)):
+async def uploadDisenio(response : Response ,files: List[UploadFile] = File(...), cod_pedido: str = Form(...), cod_detalle: str = Form(...), user=Depends(manager)):
     return files
 
 @Trabajos.get("/produccion/{cod}")
@@ -48,7 +49,7 @@ async def produccion(request: Request, cod:str, user=Depends(manager)):
         if not band:
             data = trabajos.trabajos()
             msg = 'No hay insumos suficientes para iniciar la producción'
-            return templates.TemplateResponse("orden_trabajo.html", context={"request": request, 'trabajos': data, 'msg': msg})
+            return templates.TemplateResponse("orden_trabajo.html", context={"request": request, 'trabajos': data, 'msg': msg, "userInfo": user})
     #producto = trabajos.detalleProduccion(info['detallesPedidos_id']['$oid'])
     producto = trabajos.detalleProduccion(cod)
     insumosPerdidos = insumos.insumosPerdidos(cod)

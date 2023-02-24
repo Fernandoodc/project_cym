@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Proveedores{% endblock %}
+{% block css %}
+  <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+{% endblock %}
+{% block content %}
+    <div class="pagetitle">
+      <h1>Proveedores</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+          <li class="breadcrumb-item">Insumos</li>
+          <li class="breadcrumb-item active">Proveedores</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Listado</h5>
+            <div class="table-responsive-sm mt-3">
+              
+              <!-- Modal Body -->
+              <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
+              <div class="modal fade" id="infoProveedor-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="infoProveedor-title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="infoProveedor-title">Datos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="" id="infoProveedor-form">
+                      <div class="modal-body">
+                        <div class="container mt-3">
+                          <div class="row mb-3">
+                            <label for="#rucProveedor" class="col-form-label col-sm-2">RUC<span class="text-danger required">*</span></label>
+                            <div class="col-sm-5">
+                              <input type="text" name="rucProveedor" id="rucProveedor" class="form-control infoProveedor" required>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="#nombreProveedor" class="col-form-label col-sm-2">Nombre<span class="text-danger required">*</span></label>
+                            <div class="col-sm-10">
+                              <input type="text" name="nombreProveedor" id="nombreProveedor" class="form-control infoProveedor" required>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="#direccionProveedor" class="col-form-label col-sm-2">Dirección</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="direccionProveedor" id="direccionProveedor" class="form-control infoProveedor">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="#celularProveedor" class="col-form-label col-sm-2">Celular</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="celularProveedor" id="celularProveedor" class="form-control infoProveedor">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="#emailProveedor" class="col-form-label col-sm-2">Email</label>
+                            <div class="col-sm-10">
+                              <input type="email" name="emailProveedor" id="emailProveedor" class="form-control infoProveedor">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="editarProveedor">Editar</button>
+                        <button type="submit" class="btn btn-success" title="Guardar" id="guardarProveedor"><i class="ri-save-3-line"></i></button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <table class="table table-hover display" id="proveedores">
+                <thead>
+                  <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">RUC</th>
+                    <th>Dirección</th>
+                    <th>Celular</th>
+                    <th scope="col">Email</th>
+                    <!--<th>Acciones</th>-->
+                  </tr>
+                </thead>
+                <tbody>
+                {% for proveedor in proveedores %}
+                
+                  <tr onclick="infoProveedor('{{proveedor._id}}')" id="{{proveedor._id}}">
+                    <td class="nombre">{{proveedor.nombre}}</td>
+                    <td class="ruc">{{proveedor._id}}</td>
+                    <td class="direccion">{{proveedor.direccion}}</td>
+                    <td class="celular">{{proveedor.celular}}</td>
+                    <td class="email">{{proveedor.email}}</td>
+                  </tr>
+                
+                {% endfor%}
+        
+                </tbody>
+              </table>
+              <!-- End Default Table Example -->
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  {% endblock %}
+  {% block scripts %}
+  <!-- Template Main JS File -->
+  <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
+<script src="/static/js/Responsive-2.4.0/js/dataTables.responsive.min.js"></script>
+  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+  <script src="/static/js/insumos.js"></script>
+  <script>
+    $(document).ready(function () {
+        $('#proveedores').DataTable({
+          language: spanish,
+          responsive: true
+        });
+    });
+    console.log(spanish)
+    </script>
+    {% if ruc %}
+      <script>
+        infoProveedor({{ruc | tojson}})
+        $('#infoProveedor-modal').on("hidden.bs.modal",function(){
+          window.close()
+        })
+      </script>
+    {% endif %}
+{% endblock %}

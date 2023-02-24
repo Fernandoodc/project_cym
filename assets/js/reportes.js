@@ -61,3 +61,15 @@ $('#filtrar-utilizados').click(function (e) {
     var fFin = $('#hasta').val();
     location.href = '/reportes/insumos/utilizados?'+$.param({'fFin': fFin, 'fInicio': fInicio})
 });
+
+$('#limpiar-historial-det').click(function (e) { 
+    e.preventDefault();
+    location.href = '/reportes/insumos/historial_det'
+});
+
+$('#filtrar-historias_det').click(function (e) { 
+    e.preventDefault();
+    var fInicio = $('#desde').val();
+    var fFin = $('#hasta').val();
+    location.href = '/reportes/insumos/historial_det?'+$.param({'fFin': fFin, 'fInicio': fInicio})
+});

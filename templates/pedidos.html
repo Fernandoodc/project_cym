@@ -32,7 +32,7 @@
               <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title">Informacion del pedido</h5>
+                    <h5 class="modal-title">Información del pedido</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="alert alert-danger alert-dismissible fade show" id="alertPedidos" role="alert" hidden>
@@ -68,15 +68,11 @@
 
                     </div>
                     <div class="row mb-3 ">
-                      <div class="col-sm-2 entregar-btn">
+                      <div class="col-sm-12 entregar-btn">
                         <button type="button" id="entregarPedido-btn" class="btn btn-primary">Entregar Pedido/s</button>
-                      </div>
-                      <div class="col-sm-2 abonar-btn">
                         <button type="button" id="abonarPedido-btn" class="btn btn-primary">Abonar</button>
-                      </div>
-                      <div class="col-sm-1">
-                        <button type="button" class="btn btn-success changeInfo" id="saveChange-btn" hidden><i
-                            class="ri-save-3-line"></i></button>
+                        <button type="button" class="btn btn-success changeInfo" id="saveChange-btn" title="Guardar" hidden><i
+                          class="ri-save-3-line"></i></button>
                       </div>
                     </div>
 
@@ -109,7 +105,7 @@
                       <div class="row mb-3">
                         <label class="col-sm-2 col-form-label">Cantidad</label>
                         <div class="col-sm-4">
-                          <input type="number" id="infoCantidad" class="form-control infoPedido" value="0" disabled>
+                          <input type="number" id="infoCantidad" min="0" class="form-control infoPedido" value="0" disabled>
                         </div>
                       </div>
                       <div class="row mb-3">
@@ -228,15 +224,48 @@
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button class="btn btn-primary" id="btnEditar">Editar</button>
-                    <button class="btn btn-primary" id="btnGuardar" hidden><i class="ri-save-3-line"></i></button>
+                    <button class="btn btn-danger" id="eliminar-btn">Eliminar</button>
+                    <button class="btn btn-primary" id="btnGuardar" hidden title="Guardar"><i class="ri-save-3-line"></i></button>
                     <button type="button" id="imprimirResumen" class="btn btn-primary">Imprimir Resumen</button>
                   </div>
                 </div>
               </div>
             </div>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="eliminarDet-modal" tabindex="-1" role="dialog" aria-labelledby="eliminarDet-title" aria-hidden="true">
+              <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                  <div class="modal-body">
+                    <div class="consulta" >
+                      <h5>¿Seguro que desea eliminar el pedido?</h5>
+                      <hr>
+                      <p class="consulta"><b>Presupuesto Total:</b>  <span id="presuTotal" ></span></p>
+                      <p><b>Presupuesto Particular:</b>  <span id="presuIndi" ></span></p>
+                      <p><b>Abonado:</b>  <span id="abonado" ></span>
+                      </p>
+                    </div>
+                    <p class="vuelto"><b>Vuelto:</b> <span></span><br>
+                      <small>Vuelto por sobrante del pago ya realizado</small>
+                    </p>
+                    <p></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary consulta" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary cerrarModal" data-bs-dismiss="modal">Cerrar</button>
+                    <a id="printFactura" class="btn btn-success printFactura" role="button">Imprimir Factura</a>
+                    <button type="button" id="eliminarDetalle" class="btn btn-danger consulta">Eliminar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            
+            
+            
             <table class="table 
               table-hover	
-              table-borderless table-bordered
+              table-borderless
               align-middle display nowrap" id="listaPedidos">
               <thead>
                 <tr>
@@ -245,17 +274,18 @@
                   <th scope="col">Producto</th>
                   <th scope="col">Fecha</th>
                   <th>Delivery</th>
-                  <th>Estado</th>
+                  <th>Producción</th>
                   <th>Entregado?</th>
                 </tr>
               </thead>
               <tbody>
 
                 {% for pedido in pedidos %}
-                <tr id="">
+                <tr id="{{pedido.pedido.codDetalle}}">
                   <td onclick="infoPedido('{{pedido.pedido.codDetalle}}')">{{pedido.codPedido}}</td>
-                  <td onclick="infoPedido('{{pedido.pedido.codDetalle}}')">{{pedido.cliente.nombre}}
-                    {{pedido.cliente.apellido}}</td>
+                  <td onclick="infoPedido('{{pedido.pedido.codDetalle}}')">
+                    <a href="/clientes/clientes?id={{pedido.cliente._id}}" target="_blank" rel="noopener noreferrer">{{pedido.cliente.nombre}} {{pedido.cliente.apellido}}</a>
+                  </td>
                   <td onclick="infoPedido('{{pedido.pedido.codDetalle}}')">{{pedido.producto.codProducto}} -
                     {{pedido.producto.descripcion}}</td>
                   <td onclick="infoPedido('{{pedido.pedido.codDetalle}}')">{{pedido.fecha}}</td>
@@ -268,7 +298,7 @@
                   <td onclick="infoPedido('{{pedido.pedido.codDetalle}}')">
                     {% for produccion in pedido.produccion%}
                     {% if produccion.etapa %}
-                    {{produccion.etapa.descripcion}}
+                      <a href="/trabajos/orden_trabajo?codProduccion={{produccion.codProduccion}}" target="_blank" rel="noopener noreferrer">{{produccion.etapa.descripcion}}</a>
                     {% endif %}
                     {% endfor %}
                   </td>
@@ -310,7 +340,6 @@
 {% block scripts %}
 <!-- Template Main JS File -->
 <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-<script src="{{ url_for('static', path='/js/main.js') }}"></script>
 <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
 <script src="/static/js/dataTables.responsive.min.js"></script>
 <script src="/static/js/dataTables.rowGroup.min.js"></script>
@@ -326,14 +355,20 @@
       rowGroup: {
         dataSrc: 0
       },
-      dom: 'Bfrtilp',
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ]
     });
   });
-  console.log(spanish)
 </script>
+{% if codDetalle %}
+      <script>
+       $(document).ready(function(){
+        infoPedido({{codDetalle | tojson}})
+        $('#detallePedido').on("hidden.bs.modal",function(){
+          window.close()
+        })
+       })
+      </script>
+    {% endif %}
+
 {% endblock %}
 </body>
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" {% block htmlClass %}{%endblock%}>
 
 <head>
   <meta charset="utf-8">
@@ -45,7 +45,7 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
+      <a href="/" class="logo d-flex align-items-center">
         <img src="{{ url_for('static', path='/img/logo.png') }}" alt="">
         <span class="d-none d-lg-block">C&M Emprendimientos</span>
       </a>
@@ -64,85 +64,12 @@
           </a>
         </li><!-- End Search Icon-->
 
-        <li class="nav-item dropdown">
 
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number">4</span>
-          </a><!-- End Notification Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-            <li class="dropdown-header">
-              You have 4 new notifications
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-exclamation-circle text-warning"></i>
-              <div>
-                <h4>Lorem Ipsum</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>30 min. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-x-circle text-danger"></i>
-              <div>
-                <h4>Atque rerum nesciunt</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>1 hr. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-check-circle text-success"></i>
-              <div>
-                <h4>Sit rerum fuga</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>2 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-info-circle text-primary"></i>
-              <div>
-                <h4>Dicta reprehenderit</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>4 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li class="dropdown-footer">
-              <a href="#">Show all notifications</a>
-            </li>
-
-          </ul><!-- End Notification Dropdown Items -->
-
-        </li><!-- End Notification Nav -->
 
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="/static/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+            <img src="/static/img/user.png" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">{{userInfo.username}}</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -159,7 +86,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+              <a class="dropdown-item d-flex align-items-center" href="/profile">
                 <i class="bi bi-gear"></i>
                 <span>Configurar Cuenta</span>
               </a>
@@ -272,7 +199,7 @@
             </a>
           </li>
           <li>
-            <a href="/insumos/proveedores">
+            <a href="/proveedores/">
               <i class="bi bi-circle"></i><span>Proveedores</span>
             </a>
           </li>
@@ -280,7 +207,7 @@
       </li><!-- End Charts Nav -->
 
       {% if userInfo.codTipoUsuario == 1 %}
-
+      
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#equipos-nav" data-bs-toggle="collapse" href="#">
           <i class="ri-printer-fill"></i><span>Equipos</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -302,7 +229,39 @@
             </a>
           </li>
         </ul>
-      </li><!-- End Icons Nav -->
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#auditorias-nav" data-bs-toggle="collapse" href="#">
+          <i class="ri-file-search-fill"></i><span>Auditorias</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="auditorias-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/auditorias/productos" id="audiProductos">
+              <i class="bi bi-circle"></i><span>Productos</span>
+            </a>
+          </li>
+          <li>
+            <a href="/auditorias/pedidos" id="audiPedidos">
+              <i class="bi bi-circle"></i><span>Pedidos</span>
+            </a>
+          </li>
+          <li>
+            <a href="/auditorias/det_pedidos" id="audiDetPedidos">
+              <i class="bi bi-circle"></i><span>Detalles Pedidos</span>
+            </a>
+          </li>
+          <li>
+            <a href="/auditorias/proveedores" id="audiProveedores">
+              <i class="bi bi-circle"></i><span>Proveedores</span>
+            </a>
+          </li>
+          <li>
+            <a href="/auditorias/insumos" id="audiInsumos">
+              <i class="bi bi-circle"></i><span>Insumos</span>
+            </a>
+          </li>
+        </ul>
+      </li>
       <li class="nav-heading">Reportes</li>
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#reportes-nav" data-bs-toggle="collapse" href="#">
@@ -317,11 +276,6 @@
           <li>
             <a href="/reportes/pedidos/sin_entregar" id="insumos_utilizados">
               <i class="bi bi-circle"></i><span>No entregados</span>
-            </a>
-          </li>
-          <li>
-            <a href="/reportes/pedidos/adeudados" id="insumos_perdidos">
-              <i class="bi bi-circle"></i><span>Adeudados</span>
             </a>
           </li>
         </ul>
@@ -347,12 +301,22 @@
               <i class="bi bi-circle"></i><span>Utilizados</span>
             </a>
           </li>
+          <li>
+            <a href="/reportes/insumos/historial_det" id="nuevo_usuario">
+              <i class="bi bi-circle"></i><span>Historial de Compras</span>
+            </a>
+          </li>
         </ul>
       </li>
-
+      <li class="nav-heading">Ajustes del Sistema</li>
       <li class="nav-item">
-        <a class="nav-link collapsed active" href="/usuarios/"  id="usuarios">
+        <a class="nav-link collapsed" href="/usuarios/"  id="usuarios-nav">
           <i class="ri-user-3-line"></i><span>Usuarios</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="/ajustes/"  id="ajustes-nav">
+          <i class="ri-settings-4-line"></i><span>Ajustes</span>
         </a>
       </li>
 
@@ -399,6 +363,15 @@
   <script src="{{ url_for('static', path='/js/main.js') }}"></script>
   {% block scripts %}
   {% endblock %}
+  
+  <script>
+    //evita numero decimales, solo enteros
+    $('input[type="number"]').keydown(function(e){
+      var tecla = e.key;
+    if (['.','e', ','].includes(tecla))
+      e.preventDefault()
+    })
+  </script>
 
 </body>
 

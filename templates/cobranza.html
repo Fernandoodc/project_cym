@@ -21,7 +21,7 @@
                         <label for="inputText" class="col-sm-2 col-form-label">CI - RUC</label>
                         <div class="col-sm-3" id="divDocumento">
                             <input type="text" class="form-control" id="documento" value="{{documento}}" />
-                            <small class="text-danger" id="alertDocumento" ></small>
+                            <small class="text-danger" id="alertDocumento" hidden>Cliente no encontrado</small>
                         </div>
                         <div class="col-sm-1">
                             <button type="button" class="btn btn-primary" id="buscarCuentas">
@@ -37,7 +37,7 @@
                     </div>
                     <div class="card table-responsive">
                         <div class="card-body">
-                            <h5 class="card-title">Estado de Cuentas</h5>
+                            <h5 class="card-title">Listado de Cuentas</h5>
                             <table class="table table-hover" id="listaCompras">
                                 <thead>
                                     <tr>
@@ -50,33 +50,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="bodyLista">
-                                    <!-- Modal Productos -->
-                                    <div class="modal fade" id="productos-modal" tabindex="-1" data-bs-backdrop="static"
-                                        data-bs-keyboard="false" role="dialog" aria-labelledby="listaProductos"
-                                        aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm"
-                                            role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="listaProductos">Productos</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <ul class="">
-                                                        <li class="">termo personalizado</li>
-                                                        <li class="">Sublimacion</li>
-                                                        <li class="">estampado</li>
-                                                        <li>Matero personalizado</li>
-                                                    </ul>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">Cerrar</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <!-- Modal Abonar-->
                                     <div class="modal fade" id="abonar-modal" tabindex="-1" data-bs-backdrop="static" role="dialog"
@@ -226,6 +199,14 @@
 {% if documento != '' %}
     <script>
         $('#buscarCuentas').click()
+    </script>
+{% endif %}
+{% if codPedido %}
+    <script>
+        abonar({{codPedido | tojson}})
+        $('#abonar-modal').on("hidden.bs.modal",function(){
+            window.close()
+        })
     </script>
 {% endif %}
 {% endblock %}

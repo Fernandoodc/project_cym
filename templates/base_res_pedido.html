@@ -58,15 +58,18 @@
         </div>
         <div class="row justify-content-center align-items-center g-2">
             <div class="col">
-                <h4 class="text sub-title text-center" >Codigo del Pedidido: <span class="codPedido">PE22121</span></h3>
+                <h4 class="text sub-title text-center" >Codigo del Pedidido: <span class="codPedido">{{codPedido}}</span></h3>
             </div>
         </div>
         <div class="row justify-content-center align-items-center g-2">
-            <div class="col-8 text-center">
+            <div class="col-5 text-center">
                 <p><b>Cliente:</b> <span class="nombre">{{cliente.cliente.nombre}} {{cliente.cliente.apellido}}</span></p>
             </div>
-            <div class="col-4 text-center">
+            <div class="col-3 text-center">
                 <p><b>RUC:</b> <span class="documento">{{cliente.cliente.documento}}</span></p> 
+            </div>
+            <div class="col-3 text-center">
+                <p><b>Fecha:</b> <span class="documento">{{fecha}}</span></p> 
             </div>
         </div>
         <div class="row justify-content-center align-items-center g-2">

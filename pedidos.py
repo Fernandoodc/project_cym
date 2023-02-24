@@ -11,9 +11,10 @@ import json
 from manager import	 manager
 from mongo import delete_one, delete_many, find_one, find, update_one
 from functions import infoPedidos, trabajos
+from config import settings
 
-client = MongoClient("localhost")
-db = client['cym']
+client = MongoClient(settings.MONGODB_URI)
+db = client[settings.MONGODB_DB]
 Pedidos = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
@@ -30,13 +31,13 @@ def actPresuPedido(pedido: models.actPresu):
 
 
 @Pedidos.get("/pedidos")
-async def pedidos(request: Request, user=Depends(manager)):
+async def pedidos(request: Request, codDetalle:str = '', user=Depends(manager)):
     pedidos = infoPedidos.infoFullAllPedidos()
-    
-    return templates.TemplateResponse("pedidos.html", context={"request": request, 'pedidos': pedidos,  'userInfo': user})
+    return templates.TemplateResponse("pedidos.html", context={"request": request, 'pedidos': pedidos, 'codDetalle': codDetalle,  'userInfo': user})
+
 
 @Pedidos.get('/')
-async def listaPedidos(response: Response):
+async def listaPedidos(response: Response, user=Depends(manager)):
     pedidos = json_util._json_convert(infoPedidos.infoFullAllPedidos())
     return pedidos
 
@@ -44,7 +45,8 @@ async def listaPedidos(response: Response):
 async def nuevo_pedido(request: Request, user=Depends(manager)):
     productos =json_util._json_convert(db['productos'].find())
     delivery = json_util._json_convert(db['configuraciones'].find_one())
-    return templates.TemplateResponse('cym_nuevo_pedido.html', context={'request': request, 'productos': productos, 'delivery' : delivery['delivery'], 'userInfo': user})    
+    nacionalidades = json_util._json_convert(db['nacionalidades'].find())
+    return templates.TemplateResponse('cym_nuevo_pedido.html', context={'request': request, 'productos': productos, 'delivery' : delivery['delivery'], 'nacionalidades': nacionalidades, 'userInfo': user})    
 
 
 @Pedidos.post('/create_pedido', status_code=status.HTTP_201_CREATED)
@@ -172,23 +174,39 @@ async def aggDetPedido(response: Response, detalle:models.detPedido, user=Depend
     return {'msg': 'success', 'codDetalle': codDetalle, 'presupuesto': total, 'total': presupuestoTotal , 'SenaRequerida': senaRequired}
 
 @Pedidos.delete("/eliminar_det")
-async def eliminarDet(codDetalle : str):
+async def eliminarDet(response: Response, codDetalle : str, user=Depends(manager)):
+    codPedido = json_util._json_convert(db['detallesPedidos'].find_one({'codDetalle': codDetalle}))
+    produccion = db['produccion'].find_one({'detallesPedidos_id': ObjectId(codPedido['_id']['$oid'])})
+    if produccion != None:
+        if produccion['etapa']['codEtapa'] != 0 and produccion['etapa']['codEtapa'] != 3:
+            response.status_code = status.HTTP_409_CONFLICT
+            return {'msg': 'No se puede eliminar, la producción está en proceso o ya fue terminado'}
+    codPedido = codPedido['codPedido']
+    anterior = db['detallesPedidos'].find_one({'codDetalle': codDetalle})
+    usuario_id = db['usuarios'].find_one({'username': user.username})
+    datosAuditoria = {
+        'codDetalle': codDetalle,
+        'fecha': datetime.datetime.now().strftime("%y-%m-%d %H:%M"),
+        'usuario': usuario_id['_id'],
+        'accion': 'eliminar',
+        'anterior': anterior
+    }
+    db['auditoriaDetallesPedidos'].insert_one(datosAuditoria)
     db['detallesPedidos'].delete_one({'codDetalle': codDetalle})
-    codPedido = db['detallesPedidos'].find_one({'codDetalle': codDetalle})['codPedido']
-    infoPedidos.actPresupuesto(codPedido)
-    return 'success'
+    result = infoPedidos.actPresupuesto(codPedido)
+    newDatos = db['pedidos'].find_one({'codPedido': codPedido})
+    return {'msg':'success',
+    'presupuesto': newDatos['presupuesto'],
+    'vuelto': result['vuelto'],
+    'saldo': result['saldo'],
+    'numeroRecibo': result['numeroRecibo']
+    }
 
 @Pedidos.delete("/eliminar_pedido", status_code=status.HTTP_200_OK)
 async def eliminarPedido(resonse: Response, codPedido: str, user=Depends(manager)):
     try:
-        info = json_util._json_convert(db['pedidos'].find_one({'codPedido': codPedido}))
-        db['clientes'].update_one({'_id': ObjectId(info['cliente_id']['$oid'])}, {"$inc": {'saldo': -info['presupuesto']}})
-        """if info['infoDelivery']['solicitado'] == True:
-            db['clientes'].update_one({'_id': ObjectId(info['cliente_id']['$oid'])}, {"$inc": {'saldo': -info['infoDelivery']['costoDelivery']}})"""
-        await delete_one('pedidos', {'codPedido': codPedido })
-        await delete_one('cuentas', {'codPedido': codPedido })
-        await delete_many('detallesPedidos', {'codPedido': codPedido})
-        return 'success'
+        await infoPedidos.eliminarPedido(codPedido=codPedido)
+        return {'msg':'success'}
     except Exception as e:
         print(e)
         resonse.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -198,8 +216,10 @@ async def eliminarPedido(resonse: Response, codPedido: str, user=Depends(manager
 async def resumenPedido(request: Request, cod: str, user=Depends(manager)):
     pedido = infoPedidos.infoDetalle(cod)
     delivery = infoPedidos.infoPedido(cod)['infoDelivery']
+    fecha =  infoPedidos.infoPedido(cod)['fecha']
     cliente = infoPedidos.infoCliente(cod)
-    return templates.TemplateResponse('base_res_pedido.html', context={'request': request, 'cliente': cliente , 'pedido': pedido, 'delivery': delivery})
+
+    return templates.TemplateResponse('base_res_pedido.html', context={'request': request, 'cliente': cliente , 'pedido': pedido, 'delivery': delivery, 'codPedido': cod, 'fecha': fecha})
 
 
 @Pedidos.get('/info_detalle')
@@ -211,7 +231,6 @@ async def infoDetallePedido(response: Response, codDetalle:str, user=Depends(man
 async def editarDetalle(response: Response, datos:models.editarDet, user=Depends(manager)):
     _id = db['detallesPedidos'].find_one({'codDetalle': datos.codDetalle})['_id']
     produccion = db['produccion'].find_one({'detallesPedidos_id': _id})
-    print(produccion)
     if(produccion != None and produccion['etapa']['codEtapa'] != 0):
         response.status_code = status.HTTP_409_CONFLICT
         return {'msg': 'Producción iniciado, no se puede editar el pedido'}
@@ -220,10 +239,11 @@ async def editarDetalle(response: Response, datos:models.editarDet, user=Depends
         response.status_code = status.HTTP_404_NOT_FOUND
         return None
     actual = json.loads(datos.json())
+    usuario_id = db['usuarios'].find_one({'username': user.username})
     datosAuditoria = {
         'codDetalle': datos.codDetalle,
         'fecha': datetime.datetime.now().strftime("%y-%m-%d %H:%M"),
-        'usuario': user.username,
+        'usuario': usuario_id['_id'],
         'accion': 'editar',
         'anterior': anterior,
         'cambios': actual
@@ -268,8 +288,12 @@ async def editarDetalle(response: Response, datos:models.editarDet, user=Depends
         'descuento': descuento,
         'presupuesto': total
     }
+    if anterior['cantidad'] != datos.cantidad:
+        incCant = datos.cantidad - anterior['cantidad']
+        db['produccion'].update_one({'detallesPedidos_id': _id}, {'$inc': {'cantidadRestante': incCant}})
     
     db['detallesPedidos'].update_one({'codDetalle': datos.codDetalle, 'codPedido': datos.codPedido}, {'$set': json.loads(datos.json())})
+    
     if anterior['presupuesto'] != presupuesto['presupuesto'] or anterior['descuento'] != presupuesto['descuento'] or anterior['subTotal'] != presupuesto['subTotal']:
         db['detallesPedidos'].update_one({'codDetalle': datos.codDetalle, 'codPedido': datos.codPedido}, {'$set': presupuesto })
         infoPedidos.actPresupuesto(datos.codPedido)
@@ -294,10 +318,11 @@ async def actualizarDelivery(response: Response, codPedido: str ,datos: models.a
     if infoDelivery['costoDelivery'] <= 0 and datos.delivery.solicitado == True:
         costoDelivery = db['configuraciones'].find_one()['delivery']['costoDelivery']
         actual['delivery']['costoDelivery'] = costoDelivery
+    usuario_id = db['usuarios'].find_one({'username': user.username})
     datosAuditoria = {
         'codPedido': codPedido,
         'fecha': datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-        'usuario': user.username,
+        'usuario': usuario_id['_id'],
         'accion': 'editar',
         'anterior': anterior,
         'cambios': actual
@@ -308,7 +333,12 @@ async def actualizarDelivery(response: Response, codPedido: str ,datos: models.a
         infoPedidos.actPresupuesto(codPedido)
     if datos.fechaEntrega != infoFechaEntrega:
         db['detallesPedidos'].update_many({'codPedido': codPedido}, {'$set': {'fechaEntrega': datos.fechaEntrega}})
-    return {'msg': 'success'}
+    
+    newPresu = db['pedidos'].find_one({'codPedido': codPedido})
+    newSaldo = db['cuentas'].find_one({'codPedido': codPedido})
+    return {'msg': 'success',
+    'saldo': newSaldo['saldo'],
+    'presupuesto': newPresu['presupuesto']}
 
 @Pedidos.post('/entregar_detalle')
 async def entregarDetalle(response: Response, datos: models.entregarDetalle, user=Depends(manager)):

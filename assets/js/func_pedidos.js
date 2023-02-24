@@ -29,6 +29,7 @@ function actLista(desc, cant, files, fechaE, presu, codDetalle){
 
     btnDel = document.createElement("button");
     btnDel.setAttribute("class", "btn btn-danger");
+    btnDel.setAttribute('type', 'button')
     btnDel.setAttribute("onclick", "eliminarDet('"+ codDetalle +"')");
     btnDel.innerHTML = '<i class="ri-delete-bin-5-line"></i>'
     //formBtns.appendChild(btnEdit);

@@ -29,6 +29,8 @@ from proveedores import Proveedores
 from reportes import Reportes
 from usuarios import Usuarios
 from equipos import Equipos
+from ajustes import Ajustes
+from auditoria import Auditoria
 from functions import login
 from jose import jwt
 from manager import manager
@@ -36,8 +38,8 @@ from mongo import find, find_one, update_one
 from config import settings
 templates = Jinja2Templates(directory="templates")
 app = FastAPI()
-client = MongoClient("localhost")
-db = client['cym']
+client = MongoClient(settings.MONGODB_URI)
+db = client[settings.MONGODB_DB]
 #connect(db="cym", host="localhost", port=27017)
 app.mount("/static", StaticFiles(directory="assets"), name="static")
 
@@ -51,6 +53,8 @@ app.include_router(Productos, prefix='/productos')
 app.include_router(Equipos, prefix='/equipos')
 app.include_router(Reportes, prefix='/reportes')
 app.include_router(Usuarios, prefix='/usuarios')
+app.include_router(Ajustes, prefix='/ajustes')
+app.include_router(Auditoria, prefix='/auditorias')
 app.include_router(Login)
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
@@ -63,7 +67,7 @@ async def UNAUTHORIZED_401(request: Request, _):
     
 
 
-@app.get('/get_users')
+'''@app.get('/get_users')
 def get_users():
     users = db['usuarios'].find()
     response = json_util._json_convert(users)
@@ -84,7 +88,7 @@ def agg_user(usuario:models.newUser):
     }
     id = db['usuarios'].insert_one(data)
     print(json_util.dumps(id))
-
+'''
 
 
 @app.get('/')
@@ -97,7 +101,7 @@ async def index(request: Request, user=Depends(manager)):
     return templates.TemplateResponse('index.html', context={'request': request, "userInfo": user})
 
 @app.post("/upload", status_code=status.HTTP_200_OK)
-async def upload_file(response : Response ,files: List[UploadFile] = File(...), cod_pedido: str = Form(...), cod_detalle: str = Form(...)):
+async def upload_file(response : Response ,files: List[UploadFile] = File(...), cod_pedido: str = Form(...), cod_detalle: str = Form(...), user=Depends(manager)):
     if files:
         if(cod_pedido == "" or cod_detalle==""):
             response.status_code = status.HTTP_400_BAD_REQUEST
@@ -242,59 +246,6 @@ async def nacionalidades():
         print(e)
         return 0
     return json_util._json_convert(nacs)
-
-
-"""from fastapi import Response, BackgroundTasks
-import pdfkit
-@app.get("/pdf")
-def get_pdf(background_tasks: BackgroundTasks, request:Request):
-    options = {
-    'page-size': 'a4',
-    'margin-top': '0.75in',
-    'margin-right': '0.75in',
-    'margin-bottom': '0.75in',
-    'margin-left': '0.75in',
-    'encoding': "UTF-8",
-    'custom-header': [
-        ('Accept-Encoding', 'gzip')
-    ],
-    'no-outline': None
-}   
-    print(str(templates.get_template("login.html")))
-    buffer = pdfkit.from_url("www.google.com")
-    #buffer = pdfkit.from_file(getcwd()+"/templates/login.html", options=options)
-
-    background_tasks.add_task(buffer)
-    headers = {'Content-Disposition': 'inline; filename="out.pdf"'}
-    return Response(buffer, headers=headers, media_type='application/pdf')"""
-
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
-from pdfkit import from_string
-
-from fastapi import Response, BackgroundTasks
-from fastapi import Response, BackgroundTasks
-@app.get("/pdf")
-def create_pdf(background_tasks: BackgroundTasks):
-    template_vars = {
-        'template_title': 'A template example',
-        'template_description': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit'
-    }
-
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template('pruebas.html')
-    html_out = template.render(template_vars, g=1)
-    print(html_out)
-    file_content = from_string(
-        html_out,
-        False,
-        #options='here_a_dict_with_special_page_properties',
-        #css='here_your_css_file_path' # its a list e.g ['my_css.css', 'my_other_css.css']
-    )
-    #background_tasks.add_task(file_content)
-    headers = {'Content-Disposition': 'inline; filename="out.pdf"'}
-    return Response(file_content, headers=headers, media_type='application/pdf')
-    #return file_content
 
 if __name__ == "__main__":
     uvicorn.run(app,) #host="0.0.0.0", port=8000)

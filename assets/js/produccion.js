@@ -3,6 +3,10 @@ $('#guardarTerminados').click(async function(){
         $('#terminado').focus();
         return 0;
     }
+    if(parseInt($('#terminado').val()) >  parseInt($('#terminado').attr('max'))){
+        $('#terminado').focus();
+        return 0;
+    }
     data = {
         codProduccion: codProduccion,
         cantidad: $('#terminado').val()
@@ -59,7 +63,7 @@ $('#btn-terminar').click(function(){
 $('#solicitarInsumo').click(async function(){
     var cantidad = $('#cantidadPerdidad')
     var comentarios = $('#comentarios')
-    var insumo = $('#insumo')
+    var insumo = $('#insumo :selected')
     
     if(cantidad.val()<=0){
         cantidad.focus()
@@ -90,6 +94,14 @@ $('#solicitarInsumo').click(async function(){
     $(this).prop('disabled', false)
     cantidad.val(0)
     comentarios.val('')
+    var newRow = $("<tr>");
+    var cols = "";
+    cols += '<td>'+insumo.text()+'</td>'
+    newRow.append(cols)
+    cols =  '<td>'+datos.cantidad+'</td>'
+    newRow.append(cols)
+    $('#listPerdidos').append(newRow);
+
 
 $('#solicitarInsumo-btn').click(function(){
     $('#alertPedida').html('')

@@ -13,7 +13,6 @@ async function registrarPago(datos) {
         contentType: "application/json",
         dataType: 'json',
         success: function (result) {
-            console.log(result)
             response = result
 
         },
@@ -54,13 +53,18 @@ async function obtenerCuentas(documento){
         url: "/clientes/deudas?"+ $.param({"documento": documento}),
         success: function(result, textStatus, xhr) { 
             respose = result
+            $('#alertDocumento').prop('hidden', true)
         },
         complete: function(xhr, textStatus){
             $('#documento').prop('disabled', false)
         },
         error: function(e){
             console.log(e)
-            alert(e.statusText)
+            if(e.status == 404){
+                $('#alertDocumento').prop('hidden', false)
+            }else{
+                alert(e.statusText)
+            }
         }
     });
     return respose
@@ -129,6 +133,7 @@ const imprimirFactura = async (cliente_id, codPedido) => {
 
 $('#buscarCuentas').click(async function(){
     $("#bodyLista").html('')
+    $('#nombre').val('')
     var documento = $('#documento')
     if(documento.val() == ''){
         documento.focus()
@@ -146,7 +151,7 @@ $('#buscarCuentas').click(async function(){
         var newUl = $('<ul>')
         var li = ''
         cuenta.detallesPedido.forEach(pedido => {
-            li += "<li>" + pedido.producto.descripcion + "</li>"
+            li = "<li>" + pedido.producto.descripcion + "</li>"
             newUl.append(li)
         });
         cols = $('<td>')
@@ -177,6 +182,9 @@ $('#registrarPago').click(async function () {
         cliente_id: id_cliente
     }
     var pago = await registrarPago(datos)
+    if(pago.saldo <= (pago.total/2)){
+        $('#help').hide();
+    }
     BANDPRINT = true
     SALDO = pago.saldo
     NUMRECIBO = pago.numeroRecibo
@@ -227,7 +235,9 @@ $('#otherCliete').change(function(){
     }
 })
 
-$('#newDocumento').change(async function(){
+
+$('#newDocumento, .newDocumento').change(async function(e){
+    e.preventDefault();
     var documento = $('#newDocumento').val()
     setTimeout(async () => {
         await $.ajax({

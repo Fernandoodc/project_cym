@@ -1,0 +1,13 @@
+[{
+  "descripcion": "No iniciado",
+  "codEtapa": 0
+},{
+  "descripcion": "Iniciado",
+  "codEtapa": 1
+},{
+  "descripcion": "Terminado",
+  "codEtapa": 2
+},{
+  "descripcion": "Pausado",
+  "codEtapa": 3
+}]

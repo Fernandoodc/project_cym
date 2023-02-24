@@ -1,0 +1,10 @@
+[{
+  "_id": 1,
+  "descripcion": "Consumible"
+},{
+  "_id": 2,
+  "descripcion": "No Consumible"
+},{
+  "_id": 3,
+  "descripcion": "Uso Interno"
+}]

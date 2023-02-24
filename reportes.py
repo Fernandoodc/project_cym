@@ -9,7 +9,7 @@ from manager import	 manager
 from functions import infoPedidos, trabajos, funcionesReportes, usuarios
 from config import settings
 
-client = MongoClient(settings.MONGODB_SERVER)
+client = MongoClient(settings.MONGODB_URI)
 db = client[settings.MONGODB_DB]
 Reportes = APIRouter()
 pedidos = funcionesReportes.Pedidos()
@@ -74,3 +74,15 @@ async def insumosPerdidos(request: Request, fInicio:str='', fFin:str='', user=De
     data = json_util._json_convert(insumos.utilizados(fInicio=fInicio, fFin=fFin))
     print(data)
     return templates.TemplateResponse('insumos_utilizados.html', context={'request': request, 'fInicio': fInicio, 'fFin': fFin, 'insumos': data, 'userInfo': user})
+
+@Reportes.get('/insumos/historial_det')
+async def historialCompras(request: Request, fInicio:str='', fFin:str='', user=Depends(manager)):
+    usuarios.controlAcceso(UPermitidos, user)
+    if fInicio == '':
+        fInicio = datetime.datetime.now() - datetime.timedelta(days=30)
+        fInicio = fInicio.strftime("%Y-%m-%d")
+    if fFin == '':
+        fFin = datetime.datetime.now().strftime("%Y-%m-%d")
+    data = json_util._json_convert(insumos.historialDet(fInicio=fInicio, fFin=fFin))
+    print(data)
+    return templates.TemplateResponse('historial_compras_det.html', context={'request': request, 'compras': data, 'fInicio': fInicio, 'fFin': fFin, 'userInfo': user})

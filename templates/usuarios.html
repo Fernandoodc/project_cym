@@ -239,7 +239,7 @@
 <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
 <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
 <script src="/static/js/Responsive-2.4.0/js/dataTables.responsive.min.js"></script>
-<script src="/static/js/password.js"></script>
+<script src="/static/js/update-user.js"></script>
 <script src="/static/js/usuarios.js"></script>
 
 <script>
@@ -257,4 +257,12 @@
         });
     });
 </script>
+{% if id %}
+      <script>
+        infoUser({{id | tojson}})
+        $('#infoUser-modal').on("hidden.bs.modal",function(){
+          window.close()
+        })
+      </script>
+    {% endif %}
 {% endblock %}

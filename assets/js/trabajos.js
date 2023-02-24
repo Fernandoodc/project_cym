@@ -12,6 +12,8 @@ async function info(codProd){
     console.log(data)
     data = data[0]
     console.log(data)
+    $('#infoCliente').text(data.cliente.nombre + ' ' + data.cliente.apellido);
+    $('#infoCliente').attr('href', '/clientes/clientes?id='+data.cliente.cliente_id['$oid']);
     $("#infoCod").val(data.codProduccion);
     $("#infoTipo").val(data.producto);
     $("#infoDescripcion").val(data.descripcion);
@@ -34,7 +36,7 @@ async function info(codProd){
             var newRow = $("<tr>");
             var cols = "";
             //cols += '<td><a href="/files?codPedido='+ data.codPedido + '&codDet='+ data.codDetalle +'&filename='+ data.archivos[i].nombre +'" > '  +data.archivos[i].nombre+"</a></td>";
-            cols += '<td><a href="/files?ruta='+ data.archivos[i].ruta +'" > '  + data.archivos[i].nombre+ "</a></td>";
+            cols += '<td><a href="/files?ruta='+ data.archivos[i].ruta +'" target="_blank"> '  + data.archivos[i].nombre+ "</a></td>";
             newRow.append(cols);
             cols = '<td><td><a class="btn btn-primary" href="/files/download?ruta='+ data.archivos[i].ruta +'&filename='+ data.archivos[i].nombre +'" role="button">Descargar</a></td></td>'
             newRow.append(cols);
@@ -46,9 +48,9 @@ async function info(codProd){
             console.log(i)
             var newRow = $("<tr>");
             var cols = "";
-            cols += '<td><a href="/get_disenios?ruta='+ data.diseños[i].ruta +'" > '  + data.diseños[i].descripcion+"</a></td>";
+            cols += '<td><a target="_blank" href="/get_disenios?ruta='+ data.diseños[i].ruta +'" > '  + data.diseños[i].descripcion+"</a></td>";
             newRow.append(cols);
-            cols = '<td><button type="button" class="btn btn-primary">Descargar</button> <button type="button" value='+ data.diseños[i].descripcion +' onclick="eliminarDisenio('+ "'" + data.diseños[i].descripcion + "'" +')" class="btn btn-danger">Eliminar</button></td>'
+            cols = '<td><a name="" id="" class="btn btn-primary" href="/files/download?ruta='+ data.diseños[i].ruta +'&filename='+ data.diseños[i].descripcion +  '" role="button" target="_blank"><i class="ri-download-2-line"></i></a> <button type="button" value='+ data.diseños[i].descripcion +' onclick="eliminarDisenio('+ "'" + data.diseños[i].descripcion + "'" +')" class="btn btn-danger"><i class="ri-delete-bin-5-fill"></i></button></td>'
             newRow.append(cols);
             $("#infoDisenios").append(newRow);
         }
@@ -99,9 +101,9 @@ $("#aggDiseño").on("click", async function(){
         for(let i = 0; i<files.length; i++){
             var newRow = $("<tr>");
             var cols = "";
-            cols += '<td><a href="/get_disenios?ruta='+ files[i].ruta +'" > '  +files[i].descripcion+"</a></td>";
+            cols += '<td><a target="_blank" href="/get_disenios?ruta='+ files[i].ruta +'" > '  +files[i].descripcion+"</a></td>";
             newRow.append(cols);
-            cols = '<td><a name="" id="" class="btn btn-primary" href="/files/download?ruta='+ files[i].ruta +'" role="button" target="_blank"><i class="ri-download-2-line"></i></a> <button type="button" value='+ files[i].descripcion +' onclick="eliminarDisenio('+ "'" + files[i].descripcion + "'" +')" class="btn btn-danger">><i class="ri-delete-bin-5-fill"></i></button></td>'
+            cols = '<td><a name="" id="" class="btn btn-primary" href="/files/download?ruta='+ files[i].ruta +'&filename='+ files[i].descripcion +  '" role="button" target="_blank"><i class="ri-download-2-line"></i></a> <button type="button" value='+ files[i].descripcion +' onclick="eliminarDisenio('+ "'" + files[i].descripcion + "'" +')" class="btn btn-danger"><i class="ri-delete-bin-5-fill"></i></button></td>'
             newRow.append(cols);
             $("#infoDisenios").append(newRow);
         }
@@ -119,7 +121,7 @@ $("#checkAprovado").change( async function(){
     $("#checkAprovado").prop("disabled", true)
     await aprovacion(estado)
     $("#checkAprovado").prop("disabled", false)
-    data.aprovado = estado
+    data.aprovado = estado.estado
 })
 
 $('#btnProduccion').click(function(){
@@ -135,5 +137,5 @@ $('#btnProduccion').click(function(){
 
 async function eliminarDisenio(filename){
     await deleteDesing(data.codPedido, data.codDetalle, data.codProduccion, filename)
-    await info(data._id.$oid)
+    await info(data.codProduccion)
 }
