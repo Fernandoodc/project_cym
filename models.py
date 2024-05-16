@@ -108,7 +108,7 @@ class aprovacion(BaseModel):
 
 class entregarDetalle(BaseModel):
     fechaEntrega: str = datetime.now().strftime("%Y-%m-%d")
-    codDetalle: str
+    codDetalle: str 
     entregado: bool
 
 class entregarPedido(BaseModel):

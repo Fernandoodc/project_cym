@@ -1,88 +1,92 @@
 {% extends "base.html" %}
 {% block title %}Productos{% endblock %}
 {% block css %}
-  <link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
-  <link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
+<link href="{{url_for('static', path='css/datatables.min.css')}}" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/static/css/rowGroup.dataTables.min.css">
 {% endblock %}
 {% block content %}
-    <div class="pagetitle">
-      <h1>Lista de Productos Ofrecidos</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Inicio</a></li>
-          <li class="breadcrumb-item active">Lista de Productos</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-    <section class="section">
-      <div class="row">
-        <div class="col-lg-12">
+<div class="pagetitle">
+  <h1>Lista de Productos Ofrecidos</h1>
+  <nav>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+      <li class="breadcrumb-item active">Lista de Productos</li>
+    </ol>
+  </nav>
+</div><!-- End Page Title -->
+<section class="section">
+  <div class="row">
+    <div class="col-lg-12">
 
-          <div class="card">
-            <div class="card-body"> 
-              <div class="modal fade" id="eliminarProducto-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="eliminarProducto-title" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
-                      <div class="modal-content">
-                          <div class="modal-body">
-                              <p>¿Seguro que desea eliminar el Producto?</p>
-                          </div>
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-danger" id="eliminarProducto-btn">Eliminar</button>
-                              <button type="button" class="btn btn-primary"  data-bs-dismiss="modal">Cancelar</button>
-                          </div>
-                      </div>
-                  </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="modal fade" id="eliminarProducto-modal" tabindex="-1" data-bs-backdrop="static"
+            data-bs-keyboard="false" role="dialog" aria-labelledby="eliminarProducto-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <p>¿Seguro que desea eliminar el Producto?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" id="eliminarProducto-btn">Eliminar</button>
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
               </div>
-            <div class="table-responsive-sm mt-3">
-              <table class="table table-hover display" id="listaProductos">
-                <thead>
-                  <tr>
-                    <th scope="col">Cod.</th>
-                    <th scope="col">Descripción</th>
-                    <th>Precio Base.</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
+            </div>
+          </div>
+          <div class="table-responsive-sm mt-3">
+            <table class="table table-hover display" id="listaProductos">
+              <thead>
+                <tr>
+                  <th scope="col">Cod.</th>
+                  <th scope="col">Descripción</th>
+                  <th>Precio Base.</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
                 {% for producto in productos %}
-                
-                  <tr id="" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">
-                    <td>{{producto.codProducto}}</td>
-                    <td>{{producto.descripcion}}</td>
-                    <td>{{producto.precioBase}}</td>
-                    <td><a name="editarProducto" id="editarProducto" class="btn btn-primary" href="/productos/editar_producto/{{producto.codProducto}}" role="button">Editar</a> <button type="button" class="btn btn-danger" onclick="eliminarProducto('{{producto.codProducto}}')">Eliminar</button></td>
-                  </tr>
-                
+
+                <tr id="" data-bs-toggle="modal" data-bs-target="#detalleTrabajo">
+                  <td>{{producto.codProducto}}</td>
+                  <td>{{producto.descripcion}}</td>
+                  <td>{{producto.precioBase}}</td>
+                  <td><a name="editarProducto" id="editarProducto" class="btn btn-primary"
+                      href="/productos/editar_producto/{{producto.codProducto}}" role="button">Editar</a> <button
+                      type="button" class="btn btn-danger"
+                      onclick="eliminarProducto('{{producto.codProducto}}')">Eliminar</button></td>
+                </tr>
+
                 {% endfor%}
-        
-                </tbody>
-              </table>
-              <!-- End Default Table Example -->
-            </div>
-            </div>
+
+              </tbody>
+            </table>
+            <!-- End Default Table Example -->
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
-  {% endblock %}
-  {% block scripts %}
-  <!-- Template Main JS File -->
-  <script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/productos.js') }}"></script>
-  <script>
-    $(document).ready(function () {
-        $('#listaProductos').DataTable({
-            language: spanish,
-            order: [[2, 'asc']]
-         });
+{% endblock %}
+{% block scripts %}
+<!-- Template Main JS File -->
+<script src="{{ url_for('static', path='/js/jquery-3.6.1.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/datatables.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/funciones_ajax.js') }}"></script>
+<script src="{{ url_for('static', path='/js/productos.js') }}"></script>
+<script>
+  $(document).ready(function () {
+    $('#listaProductos').DataTable({
+      language: spanish,
+      order: [[2, 'asc']]
     });
-    console.log(spanish)
-    </script>
+  });
+  console.log(spanish)
+</script>
 {% endblock %}
 </body>
 
